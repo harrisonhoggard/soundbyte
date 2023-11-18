@@ -12,11 +12,8 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
-import net.dv8tion.jda.api.events.guild.override.PermissionOverrideCreateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -46,8 +43,6 @@ public class Bot extends ListenerAdapter{
 
     private static Logger logger;
     public static AWSHandler aws;
-
-    private static final Map<Long, Long> devChannel = new HashMap<>();
 
     private static final EventWaiter eventWaiter = new EventWaiter();
 
@@ -162,6 +157,42 @@ public class Bot extends ListenerAdapter{
         }
     }
 
+    // Creates the required admin role if it does not yet exist.
+    private static void createAdminRole(Guild guild) {
+        if (guild.getRolesByName(Config.get("ADMIN_ROLE"), true).isEmpty() && guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES))
+        {
+            guild.createRole()
+                        .setName(Config.get("ADMIN_ROLE"))
+                        .setColor(Color.red)
+                        .setMentionable(true)
+                        .complete();
+
+            log(getLogType(), "Created " + Config.get("ADMIN_ROLE") + " role in guild " + guild.getName());
+
+            Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                        .setColor(Color.green)
+                        .addField("Role created", "Created " + guild.getRolesByName(Config.get("ADMIN_ROLE"), true).get(0).getAsMention() +
+                                " role and assigned it to the server owner \"" + Objects.requireNonNull(guild.getOwner()).getAsMention() +
+                                "\". Be sure you give this only to people you trust.", false)
+                        .build())
+                    .queue();
+
+            guild.addRoleToMember(Objects.requireNonNull(guild.getOwner()), guild.getRolesByName(Config.get("ADMIN_ROLE"), true).get(0))
+                    .complete();
+            log(getLogType(), "Gave the guild owner the " + Config.get("ADMIN_ROLE") + " role");
+        }
+        else if (!guild.getRolesByName(Config.get("ADMIN_ROLE"), true).isEmpty())
+        {
+            Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                        .setColor(Color.cyan)
+                        .addField(Config.get("ADMIN_ROLE"), "Be sure to give this role only to people you trust.", false)
+                        .build())
+                    .queue();
+
+            log(getLogType(), guild.getName() + " created the " + Config.get("ADMIN_ROLE") + " role.");
+        }
+    }
+
     // Initializes everything required for each Discord server in which the bot is present.
     public static void guildInit(Guild guild) {
 
@@ -171,98 +202,25 @@ public class Bot extends ListenerAdapter{
         keys.add("ServerID");
         keyVals.add(guild.getId());
 
-        if (!guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES))
-        {
-            Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
-                        .setColor(Color.red)
-                        .addField("Insufficient permissions", "In order to work as intended, I'll need the Manage Roles permission. I'll continue initializing after it's given to me", false)
-                        .build())
-                    .queue(message -> eventWaiter.waitForEvent(
-                            GuildMemberRoleAddEvent.class,
-                            e -> guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES),
-                            e -> {
-                                Objects.requireNonNull(e.getGuild().getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
-                                                .setColor(Color.green)
-                                                .addField("Thank you", "Continuing initialization", false)
-                                                .build())
-                                        .queue();
-                                guildInit(guild);
-                            }
-                    ));
-            return;
-        }
-
-        // Creates the required admin role if it does not yet exist.
         if (guild.getRolesByName(Config.get("ADMIN_ROLE"), true).isEmpty())
         {
-            try {
-                guild.createRole()
-                        .setName(Config.get("ADMIN_ROLE"))
-                        .setColor(Color.red)
-                        .setMentionable(true)
-                        .complete();
-
-                log(getLogType(), "Created " + Config.get("ADMIN_ROLE") + " role in guild " + guild.getName());
-
-                guild.addRoleToMember(Objects.requireNonNull(guild.getOwner()), guild.getRolesByName(Config.get("ADMIN_ROLE"), true).get(0))
-                        .complete();
-                log(getLogType(), "Gave the guild owner the " + Config.get("ADMIN_ROLE") + " role");
-
-                Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
-                                .setColor(Color.cyan)
-                                .addField(Config.get("ADMIN_ROLE") + " role created", "Created " + guild.getRolesByName(Config.get("ADMIN_ROLE"), true).get(0).getAsMention() + " role.", false)
-                                .build())
-                        .queue();
-            } catch (InsufficientPermissionException e) {
+            if (guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES))
+                createAdminRole(guild);
+            else
+            {
                 Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
                             .setColor(Color.red)
-                            .addField("Insufficient permissions", "I tried to create a new " + Config.get("ADMIN_ROLE") + " role, but I need permission to manage roles.", false)
+                            .addField("No " + Config.get("ADMIN_ROLE") + " role is present", "Some commands require a role named \"" +
+                                    Config.get("ADMIN_ROLE") + "\" to execute. Either create one, or give me permission to manage roles and I'll do it for you.", false)
                             .build())
-                        .queue();
-                Bot.log(getLogType(), "Tried to create the " + Config.get("ADMIN_ROLE") + " role, but I don't have the Manage Roles permission.");
-
-                eventWaiter.waitForEvent(PermissionOverrideCreateEvent.class,
-                        event -> guild.getSelfMember().equals(event.getMember()),
-                        event -> Objects.requireNonNull(event.getGuild().getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
-                                    .setColor(Color.green)
-                                    .addField("Thank you", "Trying to create the " + Config.get("ADMIN_ROLE") + " again", false)
-                                    .build())
-                                .queue());
-            }
-        }
-        if (guild.getRolesByName("Bot", true).isEmpty())
-        {
-            try {
-                guild.createRole()
-                        .setName("Bot")
-                        .setColor(Color.blue)
-                        .setMentionable(true)
-                        .complete();
-
-                log(getLogType(), "Created bot role in guild " + guild.getName());
-
-                Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
-                                .setColor(Color.cyan)
-                                .addField("Bot role created", "Be sure to move the " + guild.getRolesByName("Bot", true).get(0).getAsMention() + " role to the top, in order for me to work as intended.", false)
-                                .build())
-                        .queue();
-
-                guild.addRoleToMember(jda.getSelfUser(), guild.getRolesByName("Bot", true).get(0)).queue();
-            } catch (InsufficientPermissionException e) {
-                Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
-                            .setColor(Color.red)
-                            .addField("Insufficient permissions", "I tried to create a new bot role for myself, but I need permission to manage role.", false)
-                            .build())
-                        .queue();
-                Bot.log(getLogType(), "Tried to create the bot role, but I don't have the Manage Roles permission.");
-
-                eventWaiter.waitForEvent(PermissionOverrideCreateEvent.class,
-                        event -> guild.getSelfMember().equals(event.getMember()),
-                        event -> Objects.requireNonNull(event.getGuild().getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
-                                        .setColor(Color.green)
-                                        .addField("Thank you", "Trying to create the " + Config.get("ADMIN_ROLE") + " again", false)
-                                        .build())
-                                .queue());
+                        .queue(message -> eventWaiter.waitForEvent(
+                                Event.class,
+                                e -> guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES) || !guild.getRolesByName(Config.get("ADMIN_ROLE"), true).isEmpty(),
+                                e -> {
+                                    if (e.toString().compareTo("GuildMemberRoleAddEvent") == 0|| e.toString().compareTo("RoleUpdateNameEvent[name](new role -> " + Config.get("ADMIN_ROLE") + ")") == 0)
+                                        createAdminRole(guild);
+                                }
+                        ));
             }
         }
 
@@ -278,20 +236,24 @@ public class Bot extends ListenerAdapter{
                     .queue();
             guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.cyan)
-                        .addField("Commands", "In order to upload a sound, just type in \"" + Config.get("COMMAND_PREFIX") + " add\", and then attach a sound file with the extension \".ogg\". If you're not sure how to convert one, just " +
-                                "click on this link to learn how to use Audacity to accomplish this https://www.cedarville.edu/insights/computer-help/post/convert-audio-files.", false)
+                        .addField("Commands", "In order to upload a sound, just type in \"" + Config.get("COMMAND_PREFIX") +
+                                " add\", and then attach a sound file with the extension \".ogg\" in the same message. " +
+                                "If you're not sure how to convert a sound file, just click on this link to learn how to use Audacity to do this. " +
+                                "https://www.cedarville.edu/insights/computer-help/post/convert-audio-files.", false)
                         .build())
                     .queue();
             guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.cyan)
-                        .addField("Commands (cont.)", "You can also remove with \"" + Config.get("COMMAND_PREFIX") + " remove\", and you can add other people's sounds if you have the " + guild.getRolesByName(Config.get("ADMIN_ROLE"), false).get(0).getAsMention()+
-                                "role by entering \"" + Config.get("COMMAND_PREFIX") + " add @someone\", and you can also remove sounds the same way.", false)
+                        .addField("Commands (cont.)", "You can also remove with \"" + Config.get("COMMAND_PREFIX") + " remove\", " +
+                                "and you can add other people's sounds if you have the \"" + Config.get("ADMIN_ROLE") + "\" role by entering \"" +
+                                Config.get("COMMAND_PREFIX") + " add @someone\". You can also remove sounds the same way.", false)
                         .build())
                     .queue();
             guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.cyan)
-                        .addField("Rare and Ultra-rare", "There are two other tiers of sounds: a rare, and an ultra-rare. These are supposed to be special sounds that play randomly, and these can also be customized for " +
-                                "your server. Just use \"" + Config.get("COMMAND_PREFIX") + " rare\" and \"" + Config.get("COMMAND_PREFIX") +  " ultra\" with an attached sound to change them.", false)
+                        .addField("Rare and Ultra-rare", "There are two other tiers of sounds: a rare, and an ultra-rare. " +
+                                "These are special sounds that play randomly, and can also be customized for your server. Just use \"" +
+                                Config.get("COMMAND_PREFIX") + " rare\" and \"" + Config.get("COMMAND_PREFIX") + " ultra\" with an attached .ogg sound file to change them.", false)
                         .build())
                     .queue();
             guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
@@ -302,44 +264,12 @@ public class Bot extends ListenerAdapter{
                     .queue();
             guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.cyan)
-                        .addField("Initializing", "Give me a few moments to setup everything.", false)
+                        .addField("Initializing...", "Give me a few more moments to setup everything.", false)
                         .build())
                     .queue();
 
             log(getLogType(), "Sent tutorial to server \"" + guild.getName() + "\"");
         }
-        
-		// Creates the required dev channel that the bot can send messages.
-        /*if (guild.getTextChannelsByName("dev-channel", true).isEmpty() && (aws.getItem("SoundByteServerList", "ServerID", guild.getId()).get("Dev Channel Preference") == null || aws.getItem("SoundByteServerList", "ServerID", guild.getId()).get("Dev Channel Preference").s().compareTo("false") != 0))
-        {
-            guild.createTextChannel("dev-channel")
-                    .complete();
-
-            TextChannel textChannel = guild.getTextChannelsByName("dev-channel", true).get(0);
-
-            textChannel.getManager()
-                    .putRolePermissionOverride(guild.getPublicRole().getIdLong(), null, Collections.singleton(Permission.VIEW_CHANNEL))
-                    .complete();
-
-            textChannel.getManager()
-                    .setTopic("The channel that " + Config.get("BOT_NAME") + " created. Dev messages will be sent here.")
-                    .complete();
-
-            textChannel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.cyan)
-                        .addField("ATTENTION", "I created this channel to send dev messages. I highly recommend you do not delete this channel.\n If you want to keep it, react with ✅.\nTo delete it, react with ❌.", false)
-                        .build())
-                    .queue(message -> {
-                        message.addReaction(Emoji.fromUnicode("✅")).queue();
-                        message.addReaction(Emoji.fromUnicode("❌")).queue();
-
-                        devChannel.put(guild.getIdLong(), message.getIdLong());
-                    });
-
-            log(getLogType(), "Created dev text channel in guild " + guild.getName());
-        }
-        else {
-            aws.updateTableItem("SoundByteServerList", "ServerID", guild.getId(), "Dev Channel Preference", "true");
-        }*/
 
         // Creates each guild's join sound bucket if it does not yet exist.
         String bucketName = guild.getId() + "-joinsounds";
@@ -419,33 +349,6 @@ public class Bot extends ListenerAdapter{
             {
                 new DiscordHandler(guild, textChannel, member, arg, attachments);
             }
-        }
-    }
-
-    public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
-        if (Objects.requireNonNull(event.getMember()).getUser().isBot() || !devChannel.containsKey(event.getGuild().getIdLong()))
-            return;
-
-        if (devChannel.get(event.getGuild().getIdLong()) == event.getMessageIdLong())
-        {
-            if (event.getEmoji().getName().equals("✅"))
-            {
-                aws.updateTableItem("SoundByteServerList", "ServerID", event.getGuild().getId(), "Dev Channel Preference", "true");
-                event.getChannel().sendMessageEmbeds(new EmbedBuilder()
-                            .setColor(Color.cyan)
-                            .addField("Dev channel", "Will keep the dev channel", false)
-                            .build())
-                        .queue();
-                Bot.log(getLogType(), event.getGuild().getName() + " decided to keep the dev channel");
-            }
-            else if (event.getEmoji().getName().equals("❌"))
-            {
-                event.getChannel().asTextChannel().delete().queue();
-                aws.updateTableItem("SoundByteServerList", "ServerID", event.getGuild().getId(), "Dev Channel Preference", "false");
-                Bot.log(getLogType(), event.getGuild().getName() + " decided to remove the dev channel");
-            }
-
-            devChannel.remove(event.getGuild().getIdLong());
         }
     }
 

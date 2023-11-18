@@ -43,7 +43,7 @@ public class RareJS extends CommandObject {
 
     @Override
     public String getDesc() {
-        return "add a rare join sound";
+        return "set a rare join sound";
     }
 
     @Override
@@ -58,9 +58,6 @@ public class RareJS extends CommandObject {
 
     @Override
     public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
-        if (!attachments.isEmpty())
-            textChannel.deleteMessageById(textChannel.getLatestMessageId()).queue();
-
         if (arg.length >= 3)
         {
             textChannel.sendMessageEmbeds(new EmbedBuilder()

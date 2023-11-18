@@ -67,9 +67,6 @@ public class RemoveJS extends CommandObject {
 
     @Override
     public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
-        if (!attachments.isEmpty())
-            textChannel.deleteMessageById(textChannel.getLatestMessageId()).queue();
-
         User user;
         try {
             user = Objects.requireNonNull(guild.getMemberById(arg[2].replaceAll("[<@>]", ""))).getUser();

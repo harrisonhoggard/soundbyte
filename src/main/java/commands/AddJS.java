@@ -54,7 +54,7 @@ public class AddJS extends CommandObject {
 
     @Override
     public String getDesc() {
-        return "add a person's join sound";
+        return "set a person's join sound";
     }
 
     @Override
@@ -69,9 +69,6 @@ public class AddJS extends CommandObject {
 
     @Override
     public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
-        if (!attachments.isEmpty())
-            textChannel.deleteMessageById(textChannel.getLatestMessageId()).queue();
-
         User user;
         try {
             user = Objects.requireNonNull(guild.getMemberById(arg[2].replaceAll("[<@>]", ""))).getUser();

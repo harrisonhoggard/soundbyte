@@ -5,8 +5,6 @@ import events.util.EventObject;
 import bot.Bot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
@@ -67,20 +65,6 @@ public class VoiceStateUpdate extends EventObject {
         try {
             if (randomInt < 1)
             {
-                if (guild.getRolesByName("ULTRA-RARE", false).isEmpty())
-                {
-                    guild.createRole().setColor(Color.yellow).setName("ULTRA-RARE").setMentionable(true).complete();
-                    Bot.log(getLogType(), "Created ULTRA-RARE role for guild " + guild.getName());
-                }
-
-                Role ultraRareRole = guild.getRolesByName("ULTRA-RARE", false).get(0);
-
-                for (Member member : guild.getMembersWithRoles(ultraRareRole))
-                {
-                    guild.removeRoleFromMember(member.getUser(), ultraRareRole).complete();
-                }
-                guild.addRoleToMember(event.getMember().getUser(), ultraRareRole).complete();
-
                 Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
                                     .setColor(Color.CYAN)
                                     .addField("ULTRA-RARE STATUS ACHIEVED!", event.getMember().getAsMention() + " HAS SUCCESSFULLY ACHIEVED ULTRA-RARE STATUS!", false)
@@ -94,7 +78,7 @@ public class VoiceStateUpdate extends EventObject {
                 String tableName = guild.getId() + "-ultrarare";
                 if (Bot.aws.getItem(tableName, "MemberID", event.getMember().getId()).isEmpty())
                 {
-                    java.util.List<String> keys = new ArrayList<>();
+                    List<String> keys = new ArrayList<>();
                     List<String> keyVals = new ArrayList<>();
 
                     keys.add("MemberID");
@@ -114,6 +98,9 @@ public class VoiceStateUpdate extends EventObject {
                     Bot.aws.updateTableItem(tableName, "MemberID", event.getMember().getId(), "Amount", Integer.toString(updatedVal));
                     Bot.aws.updateTableItem(tableName, "MemberID", event.getMember().getId(), "Last Obtained", Bot.getLocalDate().format(DateTimeFormatter.ofPattern("M-d-y")));
                 }
+
+                tableName = "SoundByteServerList";
+                Bot.aws.updateTableItem(tableName, "ServerID", guild.getId(), "Current Ultra", event.getMember().getId());
             }
             else if (randomInt < 50)
             {

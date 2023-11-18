@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 // Retrieves information about a member, how many times they obtained, and last time they obtained the ultrarare role
 public class Ultrarare extends CommandObject {
@@ -68,7 +69,9 @@ public class Ultrarare extends CommandObject {
     @Override
     public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
         String tableName = guild.getId() + "-ultrarare";
+        String currentHolder;
         Member memberToGet;
+
         if (arg.length < 3)
             memberToGet = member;
         else
@@ -109,11 +112,22 @@ public class Ultrarare extends CommandObject {
         int amount = Integer.parseInt(Bot.aws.getItem(tableName, "MemberID", memberToGet.getId()).get("Amount").s());
         String lastObtained = Bot.aws.getItem(tableName, "MemberID", memberToGet.getId()).get("Last Obtained").s();
 
+        tableName = "SoundByteServerList";
+        if (Bot.aws.getItem(tableName, "ServerID", guild.getId()).get("Current Ultra") == null)
+            Bot.aws.updateTableItem(tableName, "ServerID", guild.getId(), "Current Ultra", "<empty>");
+
+        currentHolder = Bot.aws.getItem(tableName, "ServerID", guild.getId()).get("Current Ultra").s();
+        if (currentHolder.compareTo("<empty>") == 0|| currentHolder.isEmpty())
+            currentHolder = "No one";
+        else
+            currentHolder = Objects.requireNonNull(guild.getMemberById(currentHolder)).getAsMention();
+
         textChannel.sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.green)
                         .addField("Ultra Rare: " + memberToGet.getEffectiveName(),
                                 "Times obtained: " + amount + "\n"
-                                + "Last obtained: " + lastObtained,
+                                + "Last obtained: " + lastObtained + "\n\n"
+                                + "Current holder: " + currentHolder,
                                 false)
                         .build())
                 .queue();

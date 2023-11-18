@@ -43,7 +43,7 @@ public class DefaultJS extends CommandObject {
 
     @Override
     public String getDesc() {
-        return "add a default join sound";
+        return "set a default join sound";
     }
 
     @Override
@@ -58,9 +58,6 @@ public class DefaultJS extends CommandObject {
 
     @Override
     public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
-        if (!attachments.isEmpty())
-            textChannel.deleteMessageById(textChannel.getLatestMessageId()).queue();
-
         if (arg.length >= 3)
         {
             textChannel.sendMessageEmbeds(new EmbedBuilder()

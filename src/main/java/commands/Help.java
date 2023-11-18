@@ -107,7 +107,9 @@ public class Help extends CommandObject {
             sb.delete(0, sb.length());
         }
         else
-            eb.addField("Permission denied", " You do not have permission to see **" + cmd + "**. Be sure to use \"" + Config.get("COMMAND_PREFIX") + " help\" for commands you can use", false);
+            eb.setColor(Color.red).addField("Permission denied", "You do not have the required \"" + Config.get("ADMIN_ROLE") +
+                    "\" role to see **" + cmd + "**. Be sure to use \"" + Config.get("COMMAND_PREFIX") +
+                    " help\" for commands you can use", false);
 
     }
 

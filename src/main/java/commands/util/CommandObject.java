@@ -1,10 +1,13 @@
 package commands.util;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 import commands.*;
 import bot.Bot;
 import bot.Config;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -76,11 +79,21 @@ public abstract class CommandObject {
 
     // Determines whether a user has access to admin privileged commands.
     public boolean adminPriv(Member member) {
-        Role adminRole = member.getGuild().getRolesByName(Config.get("ADMIN_ROLE"), true).get(0);
+        try {
+            Role adminRole = member.getGuild().getRolesByName(Config.get("ADMIN_ROLE"), true).get(0);
 
-        if (getAdmin())
-            return member.getRoles().contains(adminRole);
-        return true;
+            if (getAdmin())
+                return member.getRoles().contains(adminRole);
+            return true;
+        } catch (IndexOutOfBoundsException e) {
+            Objects.requireNonNull(member.getGuild().getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                        .setColor(Color.red)
+                        .addField(Config.get("ADMIN_ROLE") + " role does not exist.", "There is no role called \"" +
+                                Config.get("ADMIN_ROLE") + "\", which means I can't work properly. Be sure to create one before attempting to use any commands.", false)
+                        .build())
+                    .queue();
+            return false;
+        }
     }
 
     // Determines whether a user has access to owner privileged commands.
