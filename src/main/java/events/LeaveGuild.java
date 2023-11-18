@@ -1,5 +1,6 @@
 package events;
 
+import audio.PlayerManager;
 import events.util.EventObject;
 import bot.Bot;
 import net.dv8tion.jda.api.entities.Guild;
@@ -30,6 +31,8 @@ public class LeaveGuild extends EventObject {
         Bot.aws.deleteTableItem("SoundByteServerList", "ServerID", event.getGuild().getId());
         Bot.aws.deleteTable(event.getGuild().getId() + "-ultrarare");
         Bot.aws.deleteBucket(event.getGuild().getId() + "-joinsounds");
+
+        PlayerManager.getInstance().removeGuildManager(guild);
 
         devMessage(getName(), getAction(), getGuild());
     }

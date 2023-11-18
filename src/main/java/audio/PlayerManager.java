@@ -1,5 +1,6 @@
 package audio;
 
+import bot.Bot;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -21,6 +22,10 @@ public class PlayerManager {
     private final AudioPlayerManager audioPlayerManager;
     private final Map<Long, GuildMusicManager> musicManagers;
 
+    private String getLogType() {
+        return "PLAYER MANAGER";
+    }
+
     public PlayerManager() {
         this.musicManagers = new HashMap<>();
         this.audioPlayerManager =  new DefaultAudioPlayerManager();
@@ -35,6 +40,14 @@ public class PlayerManager {
             guild.getAudioManager().setSendingHandler(guildMusicManager.getSendHandler());
             return guildMusicManager;
         });
+    }
+
+    // If the bot is removed from the guild, the guild's music manager is removed from the map.
+    // This is needed because if the bot is invited back into the guild in the same running instance as when it left,
+    // usually it would not even play any audio. Removing the guild manager from the map fixes this.
+    public void removeGuildManager(Guild guild) {
+        musicManagers.remove(guild.getIdLong());
+        Bot.log(getLogType(), "Removed " + guild.getName() + "'s music manager");
     }
 
     public void loadAndPlay(AudioChannel channel, String path) {
