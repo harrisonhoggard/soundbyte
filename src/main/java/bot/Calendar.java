@@ -28,6 +28,7 @@ public class Calendar implements Runnable{
 	}
 
 	// "Thread" that runs, executing any event that needs to be called at the refresh time.
+	@SuppressWarnings("InfiniteLoopStatement")
 	public void run() {
 		do {
 			try {
