@@ -35,6 +35,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 // Main method contained here. Responsible for initialization of everything, as well as storing all the helper methods that are needed throughout the entire program.
 public class Bot extends ListenerAdapter{
@@ -223,50 +224,99 @@ public class Bot extends ListenerAdapter{
                         ));
             }
         }
+        else if (aws.getItem("SoundByteServerList", "ServerID", guild.getId()).isEmpty())
+        {
+            Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                        .setColor(Color.yellow)
+                        .addField("ADMIN", "Some commands require the " + guild.getRolesByName(Config.get("ADMIN_ROLE"), true).get(0).getAsMention() +
+                                " to use. Make sure only people you trust have this role.", false)
+                        .build())
+                    .queue();
+        }
 
+        // Anyone know how else to do this besides the cursed way I've done it???
         if (aws.getItem("SoundByteServerList", "ServerID", guild.getId()).isEmpty())
         {
             aws.addTableItem("SoundByteServerList", keys, keyVals);
 
             Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                .setColor(Color.cyan)
+                .addField("Initializing...", "Give me a few more moments to setup everything before using commands. " +
+                        "I'll give you a tutorial on how to use me in the meantime.", false)
+                .build())
+            .queue(message -> {
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                    guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.cyan)
-                        .addField(Config.get("BOT_NAME"), "Hello, thank you for inviting me to your server. I am capable of playing short sounds over voice chat whenever" +
-                                " someone connects to a channel. There are default sounds that apply to everyone, but you can customize them if you want.", false)
+                        .addField(Config.get("BOT_NAME"), "I am capable of playing short sounds over voice chat whenever someone connects to a channel. " +
+                                "There are default sounds that apply to everyone, but you can customize them if you want. To get started, just type in **\"" + Config.get("COMMAND_PREFIX") +
+                                " help\"** for more information.", false)
                         .build())
-                    .queue();
-            guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
-                        .setColor(Color.cyan)
-                        .addField("Commands", "In order to upload a sound, just type in \"" + Config.get("COMMAND_PREFIX") +
-                                " add\", and then attach a sound file with the extension \".ogg\" in the same message. " +
-                                "If you're not sure how to convert a sound file, just click on this link to learn how to use Audacity to do this. " +
-                                "https://www.cedarville.edu/insights/computer-help/post/convert-audio-files.", false)
-                        .build())
-                    .queue();
-            guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
-                        .setColor(Color.cyan)
-                        .addField("Commands (cont.)", "You can also remove with \"" + Config.get("COMMAND_PREFIX") + " remove\", " +
-                                "and you can add other people's sounds if you have the \"" + Config.get("ADMIN_ROLE") + "\" role by entering \"" +
-                                Config.get("COMMAND_PREFIX") + " add @someone\". You can also remove sounds the same way.", false)
-                        .build())
-                    .queue();
-            guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
-                        .setColor(Color.cyan)
-                        .addField("Rare and Ultra-rare", "There are two other tiers of sounds: a rare, and an ultra-rare. " +
-                                "These are special sounds that play randomly, and can also be customized for your server. Just use \"" +
-                                Config.get("COMMAND_PREFIX") + " rare\" and \"" + Config.get("COMMAND_PREFIX") + " ultra\" with an attached .ogg sound file to change them.", false)
-                        .build())
-                    .queue();
-            guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
-                        .setColor(Color.cyan)
-                        .addField("Contact", "If you have any questions, or need to report any problems, feel free to contact me at " +
-                                "\"crispycrusaderdev@gmail.com\"", false)
-                        .build())
-                    .queue();
-            guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
-                        .setColor(Color.cyan)
-                        .addField("Initializing...", "Give me a few more moments to setup everything.", false)
-                        .build())
-                    .queue();
+                    .queue(message2 -> {
+                        try {
+                            TimeUnit.SECONDS.sleep(2);guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                                .setColor(Color.cyan)
+                                .addField("Commands", "In order to upload a sound, just type in **\"" + Config.get("COMMAND_PREFIX") +
+                                        " add\"**, and then attach a sound file with the extension **\".ogg\"** in the same message. " +
+                                        "If you're not sure how to convert a sound file, just click on this link to learn how to use Audacity to do this. " +
+                                        "https://www.cedarville.edu/insights/computer-help/post/convert-audio-files.", false)
+                                .build())
+                            .queue(message3 -> {
+                                try {
+                                    TimeUnit.SECONDS.sleep(2);
+                                    guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                                        .setColor(Color.cyan)
+                                        .addField("Commands (cont.)", "You can also remove with **\"" + Config.get("COMMAND_PREFIX") + " remove\"**, " +
+                                                "and you can add other people's sounds if you have the **\"" + Config.get("ADMIN_ROLE") + "\"** role by entering **\"" +
+                                                Config.get("COMMAND_PREFIX") + " add @someone\"**. You can also remove sounds the same way.", false)
+                                        .build())
+                                    .queue(message4 -> {
+                                        try {
+                                            TimeUnit.SECONDS.sleep(2);guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                                                .setColor(Color.cyan)
+                                                .addField("Rare and Ultra-rare", "There are two other tiers of sounds: a rare, and an ultra-rare. " +
+                                                        "These are special sounds that play randomly, and can also be customized for your server. Just use **\"" +
+                                                        Config.get("COMMAND_PREFIX") + " rare\"** and **\"" + Config.get("COMMAND_PREFIX") + " ultra\"** with an attached .ogg sound file to change them.", false)
+                                                .build())
+                                            .queue(message5 -> {
+                                                try {
+                                                    TimeUnit.SECONDS.sleep(2);guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                                                        .setColor(Color.cyan)
+                                                        .addField("Contact", "If you have any questions, or need to report any problems, feel free to contact me at " +
+                                                                "**\"crispycrusaderdev@gmail.com\"**", false)
+                                                        .build())
+                                                    .queue(message6 -> {
+                                                        try {
+                                                            TimeUnit.SECONDS.sleep(2);
+                                                        } catch (InterruptedException e) {
+                                                            throw new RuntimeException(e);
+                                                        }
+                                                    });
+                                                } catch (InterruptedException e) {
+                                                    throw new RuntimeException(e);
+                                                }
+                                            });
+                                        } catch (InterruptedException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    });
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+
+
+
 
             log(getLogType(), "Sent tutorial to server \"" + guild.getName() + "\"");
         }

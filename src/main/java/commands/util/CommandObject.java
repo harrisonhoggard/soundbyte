@@ -54,6 +54,7 @@ public abstract class CommandObject {
         commands.put("rare", new RareJS());
         commands.put("ultra", new UltraJS());
         commands.put("ultrainfo", new Ultrarare());
+        commands.put("test", new Test());
 
         getTypes();
         Bot.log(getLogType(), "Commands successfully initialized");
