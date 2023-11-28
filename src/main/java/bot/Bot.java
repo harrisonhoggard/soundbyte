@@ -241,8 +241,8 @@ public class Bot extends ListenerAdapter{
 
             Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
                 .setColor(Color.cyan)
-                .addField("Initializing...", "Give me a few more moments to setup everything before using commands. " +
-                        "I'll give you a tutorial on how to use me in the meantime.", false)
+                .addField("**!!! IMPORTANT !!! **", "Give me about 30 seconds to setup everything before using commands. " +
+                        "I'll send some information here in the meantime, and let you know when I'm ready.", false)
                 .build())
             .queue(message -> {
                 try {
@@ -286,13 +286,7 @@ public class Bot extends ListenerAdapter{
                                                         .addField("Contact", "If you have any questions, or need to report any problems, feel free to contact me at " +
                                                                 "**\"crispycrusaderdev@gmail.com\"**", false)
                                                         .build())
-                                                    .queue(message6 -> {
-                                                        try {
-                                                            TimeUnit.SECONDS.sleep(2);
-                                                        } catch (InterruptedException e) {
-                                                            throw new RuntimeException(e);
-                                                        }
-                                                    });
+                                                    .queue(message6 -> log(getLogType(), guild.getName() + ": Sent tutorial"));
                                                 } catch (InterruptedException e) {
                                                     throw new RuntimeException(e);
                                                 }
@@ -309,16 +303,10 @@ public class Bot extends ListenerAdapter{
                             throw new RuntimeException(e);
                         }
                     });
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-
-
-
-
-
-            log(getLogType(), "Sent tutorial to server \"" + guild.getName() + "\"");
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
 
         // Creates each guild's join sound bucket if it does not yet exist.
@@ -345,7 +333,7 @@ public class Bot extends ListenerAdapter{
                         .setColor(Color.green)
                         .addField("Initialization completed", "You can now use me. Type in \"" + Config.get("COMMAND_PREFIX") + " help\" to get started.", false)
                         .build())
-                    .queue();
+                    .queue(message -> log(getLogType(), guild.getName() + ": Initialization complete"));
         }
 
         keys.clear();
