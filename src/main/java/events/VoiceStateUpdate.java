@@ -65,7 +65,7 @@ public class VoiceStateUpdate extends EventObject {
         try {
             if (randomInt < 1)
             {
-                Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                Bot.defaultChannels.get(event.getGuild()).sendMessageEmbeds(new EmbedBuilder()
                                     .setColor(Color.CYAN)
                                     .addField("ULTRA-RARE STATUS ACHIEVED!", event.getMember().getAsMention() + " HAS SUCCESSFULLY ACHIEVED ULTRA-RARE STATUS!", false)
                                     .build())

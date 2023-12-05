@@ -12,8 +12,10 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.Event;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -46,6 +48,8 @@ public class Bot extends ListenerAdapter{
     public static AWSHandler aws;
 
     private static final EventWaiter eventWaiter = new EventWaiter();
+
+    public static Map<Guild, TextChannel> defaultChannels = new HashMap<>();
 
     // Starts the customized logger.
     private void logStart() {
@@ -170,7 +174,7 @@ public class Bot extends ListenerAdapter{
 
             log(getLogType(), "Created " + Config.get("ADMIN_ROLE") + " role in guild " + guild.getName());
 
-            Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+            defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.green)
                         .addField("Role created", "Created " + guild.getRolesByName(Config.get("ADMIN_ROLE"), true).get(0).getAsMention() +
                                 " role and assigned it to the server owner \"" + Objects.requireNonNull(guild.getOwner()).getAsMention() +
@@ -184,7 +188,7 @@ public class Bot extends ListenerAdapter{
         }
         else if (!guild.getRolesByName(Config.get("ADMIN_ROLE"), true).isEmpty())
         {
-            Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+            defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.cyan)
                         .addField(Config.get("ADMIN_ROLE"), "Be sure to give this role only to people you trust.", false)
                         .build())
@@ -203,13 +207,49 @@ public class Bot extends ListenerAdapter{
         keys.add("ServerID");
         keyVals.add(guild.getId());
 
+        if (guild.getDefaultChannel() == null) {
+            boolean canTalk = false;
+            TextChannel visibleChannel = null;
+
+            for (TextChannel channel : guild.getTextChannels()) {
+                if (channel.canTalk()) {
+                    canTalk = true;
+                    visibleChannel = channel;
+                    break;
+                }
+            }
+
+            if (!canTalk)
+            {
+                Objects.requireNonNull(guild.getOwner()).getUser().openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
+                            .setColor(Color.cyan)
+                            .addField("Insufficient permissions", "I don't have permission to view any text channels. This will hinder my ability to function. Please open a channel up and click the green check when this is done.", false)
+                            .build()))
+                        .queue(message -> message.addReaction(Emoji.fromUnicode("✅")).queue(reaction -> eventWaiter.waitForEvent(
+                                MessageReactionAddEvent.class,
+                                e -> e.getMessageIdLong() == message.getIdLong() && !e.retrieveUser().complete().isBot(),
+                                e -> {
+                                    System.out.println("Owner reacted");
+                                    guildInit(guild);
+                                }
+                        )));
+                return;
+            }
+            defaultChannels.put(guild, visibleChannel);
+            log(getLogType(), guild.getName() + " default channel doesn't exist or isn't visible. Set default channel to " + defaultChannels.get(guild).getName());
+        }
+        else {
+                defaultChannels.put(guild, guild.getDefaultChannel().asTextChannel());
+                log(getLogType(), guild.getName() + " default channel is visible. Set default channel to " + defaultChannels.get(guild).getName());
+        }
+
         if (guild.getRolesByName(Config.get("ADMIN_ROLE"), true).isEmpty())
         {
             if (guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES))
                 createAdminRole(guild);
             else
             {
-                Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                             .setColor(Color.red)
                             .addField("No " + Config.get("ADMIN_ROLE") + " role is present", "Some commands require a role named \"" +
                                     Config.get("ADMIN_ROLE") + "\" to execute. Either create one, or give me permission to manage roles and I'll do it for you.", false)
@@ -226,7 +266,7 @@ public class Bot extends ListenerAdapter{
         }
         else if (aws.getItem("SoundByteServerList", "ServerID", guild.getId()).isEmpty())
         {
-            Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+            defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.yellow)
                         .addField("ADMIN", "Some commands require the " + guild.getRolesByName(Config.get("ADMIN_ROLE"), true).get(0).getAsMention() +
                                 " to use. Make sure only people you trust have this role.", false)
@@ -239,7 +279,7 @@ public class Bot extends ListenerAdapter{
         {
             aws.addTableItem("SoundByteServerList", keys, keyVals);
 
-            Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+            defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                 .setColor(Color.cyan)
                 .addField("**!!! IMPORTANT !!! **", "Give me about 30 seconds to setup everything before using commands. " +
                         "I'll send some information here in the meantime, and let you know when I'm ready.", false)
@@ -247,7 +287,7 @@ public class Bot extends ListenerAdapter{
             .queue(message -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
-                    guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                    defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.cyan)
                         .addField(Config.get("BOT_NAME"), "I am capable of playing short sounds over voice chat whenever someone connects to a channel. " +
                                 "There are default sounds that apply to everyone, but you can customize them if you want. To get started, just type in **\"" + Config.get("COMMAND_PREFIX") +
@@ -255,7 +295,8 @@ public class Bot extends ListenerAdapter{
                         .build())
                     .queue(message2 -> {
                         try {
-                            TimeUnit.SECONDS.sleep(2);guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                            TimeUnit.SECONDS.sleep(2);
+                            defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                                 .setColor(Color.cyan)
                                 .addField("Commands", "In order to upload a sound, just type in **\"" + Config.get("COMMAND_PREFIX") +
                                         " add\"**, and then attach a sound file with the extension **\".ogg\"** in the same message. " +
@@ -265,7 +306,7 @@ public class Bot extends ListenerAdapter{
                             .queue(message3 -> {
                                 try {
                                     TimeUnit.SECONDS.sleep(2);
-                                    guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                                    defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                                         .setColor(Color.cyan)
                                         .addField("Commands (cont.)", "You can also remove with **\"" + Config.get("COMMAND_PREFIX") + " remove\"**, " +
                                                 "and you can add other people's sounds if you have the **\"" + Config.get("ADMIN_ROLE") + "\"** role by entering **\"" +
@@ -273,7 +314,8 @@ public class Bot extends ListenerAdapter{
                                         .build())
                                     .queue(message4 -> {
                                         try {
-                                            TimeUnit.SECONDS.sleep(2);guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                                            TimeUnit.SECONDS.sleep(2);
+                                            defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                                                 .setColor(Color.cyan)
                                                 .addField("Rare and Ultra-rare", "There are two other tiers of sounds: a rare, and an ultra-rare. " +
                                                         "These are special sounds that play randomly, and can also be customized for your server. Just use **\"" +
@@ -281,7 +323,8 @@ public class Bot extends ListenerAdapter{
                                                 .build())
                                             .queue(message5 -> {
                                                 try {
-                                                    TimeUnit.SECONDS.sleep(2);guild.getDefaultChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+                                                    TimeUnit.SECONDS.sleep(2);
+                                                    defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                                                         .setColor(Color.cyan)
                                                         .addField("Contact", "If you have any questions, or need to report any problems, feel free to contact me at " +
                                                                 "**\"crispycrusaderdev@gmail.com\"**", false)
@@ -329,7 +372,7 @@ public class Bot extends ListenerAdapter{
             aws.createDynamoTable(tableName, tableAttributes);
             log(getLogType(), tableName + " table was created");
 
-            Objects.requireNonNull(guild.getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+            defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.green)
                         .addField("Initialization completed", "You can now use me. Type in \"" + Config.get("COMMAND_PREFIX") + " help\" to get started.", false)
                         .build())
@@ -373,7 +416,13 @@ public class Bot extends ListenerAdapter{
     // When a command is sent, it gets caught here and calls the Handler object to parse.
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         String message = event.getMessage().getContentRaw();
-        Guild guild = event.getGuild();
+        Guild guild;
+        try {
+            guild = event.getGuild();
+        } catch (IllegalStateException e) {
+            Bot.log(getLogType(), "Message didn't come from guild.");
+            return;
+        }
         TextChannel textChannel = event.getChannel().asTextChannel();
         Member member = event.getMember();
 

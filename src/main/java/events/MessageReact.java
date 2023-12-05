@@ -35,7 +35,12 @@ public class MessageReact extends EventObject {
     }
 
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        guild = event.getGuild();
+        try {
+            guild = event.getGuild();
+        } catch (IllegalStateException e) {
+            Bot.log(getLogType(), " message didn't come from guild.");
+            return;
+        }
 
         if (Objects.requireNonNull(event.getMember()).getUser().isBot())
             return;

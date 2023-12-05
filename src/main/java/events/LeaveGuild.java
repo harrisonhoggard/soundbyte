@@ -28,9 +28,13 @@ public class LeaveGuild extends EventObject {
     public void onGuildLeave(GuildLeaveEvent event) {
         guild = event.getGuild();
 
-        Bot.aws.deleteTableItem("SoundByteServerList", "ServerID", event.getGuild().getId());
-        Bot.aws.deleteTable(event.getGuild().getId() + "-ultrarare");
-        Bot.aws.deleteBucket(event.getGuild().getId() + "-joinsounds");
+        try {
+            Bot.aws.deleteTableItem("SoundByteServerList", "ServerID", event.getGuild().getId());
+            Bot.aws.deleteTable(event.getGuild().getId() + "-ultrarare");
+            Bot.aws.deleteBucket(event.getGuild().getId() + "-joinsounds");
+        } catch (Exception e) {
+            Bot.log(getLogType(), e.toString());
+        }
 
         PlayerManager.getInstance().removeGuildManager(guild);
 

@@ -27,7 +27,11 @@ public class JoinedNewGuild extends EventObject {
     public void onGuildJoin(GuildJoinEvent event) {
         guild = event.getGuild();
 
-        Bot.guildInit(event.getGuild());
+        try {
+            Bot.guildInit(event.getGuild());
+        } catch (Exception e) {
+            Bot.log(getLogType(), e.toString());
+        }
 
         devMessage(getName(), getAction(), getGuild());
     }

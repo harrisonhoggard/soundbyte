@@ -69,7 +69,7 @@ public class PlayerManager {
 
             @Override
             public void noMatches() {
-                Objects.requireNonNull(channel.getGuild().getDefaultChannel()).asTextChannel().sendMessageEmbeds(
+                Bot.defaultChannels.get(channel.getGuild()).sendMessageEmbeds(
                         new EmbedBuilder()
                                 .setColor(Color.red)
                                 .addField("Error", "Could not play due to \"No Match\" error", false)
@@ -79,7 +79,7 @@ public class PlayerManager {
 
             @Override
             public void loadFailed(FriendlyException e) {
-                Objects.requireNonNull(channel.getGuild().getDefaultChannel()).asTextChannel().sendMessageEmbeds(
+                Bot.defaultChannels.get(channel.getGuild()).sendMessageEmbeds(
                         new EmbedBuilder()
                                 .setColor(Color.red)
                                 .addField("Error", "Loading failed because the join sound doesn't exist", false)

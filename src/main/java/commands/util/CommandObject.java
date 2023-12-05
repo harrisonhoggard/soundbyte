@@ -87,7 +87,7 @@ public abstract class CommandObject {
                 return member.getRoles().contains(adminRole);
             return true;
         } catch (IndexOutOfBoundsException e) {
-            Objects.requireNonNull(member.getGuild().getDefaultChannel()).asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+            Bot.defaultChannels.get(member.getGuild()).sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.red)
                         .addField(Config.get("ADMIN_ROLE") + " role does not exist.", "There is no role called \"" +
                                 Config.get("ADMIN_ROLE") + "\", which means I can't work properly. Be sure to create one before attempting to use any commands.", false)
