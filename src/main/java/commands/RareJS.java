@@ -43,7 +43,7 @@ public class RareJS extends CommandObject {
 
     @Override
     public String getDesc() {
-        return "set a rare join sound";
+        return "set a rare join sound (15 seconds or less)";
     }
 
     @Override

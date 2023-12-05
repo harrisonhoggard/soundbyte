@@ -43,7 +43,7 @@ public class UltraJS extends CommandObject {
 
     @Override
     public String getDesc() {
-        return "set an ultra-rare join sound";
+        return "set an ultra-rare join sound (40 seconds or less)";
     }
 
     @Override

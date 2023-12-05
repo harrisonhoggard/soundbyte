@@ -54,7 +54,7 @@ public class AddJS extends CommandObject {
 
     @Override
     public String getDesc() {
-        return "set a person's join sound";
+        return "set a person's join sound (10 seconds or less)";
     }
 
     @Override
