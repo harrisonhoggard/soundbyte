@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class PlayerManager {
     private static PlayerManager INSTANCE;
