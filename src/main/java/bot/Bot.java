@@ -223,7 +223,9 @@ public class Bot extends ListenerAdapter{
             {
                 Objects.requireNonNull(guild.getOwner()).getUser().openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
                             .setColor(Color.cyan)
-                            .addField("Insufficient permissions", "I don't have permission to view any text channels. This will hinder my ability to function. Please open a channel up and click the green check when this is done.", false)
+                            .addField("**IMPORTANT** -- Insufficient permissions", "I don't have permission to view any channels." +
+                                    " I will not be able to function properly or set up anything on my end, making me useless. Please make sure " +
+                                    " at least both a text and voice channel are viewable for me, and click the green check when this is done.", false)
                             .build()))
                         .queue(message -> message.addReaction(Emoji.fromUnicode("✅")).queue(reaction -> eventWaiter.waitForEvent(
                                 MessageReactionAddEvent.class,
@@ -269,7 +271,7 @@ public class Bot extends ListenerAdapter{
             defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.yellow)
                         .addField("ADMIN", "Some commands require the " + guild.getRolesByName(Config.get("ADMIN_ROLE"), true).get(0).getAsMention() +
-                                " to use. Make sure only people you trust have this role.", false)
+                                " role to use. Make sure only people you trust have this role.", false)
                         .build())
                     .queue();
         }
