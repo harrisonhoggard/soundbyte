@@ -23,14 +23,14 @@ public class JSHandler {
 
     // Method that is called when uploading a sound file to the appropriate bucket
     public static boolean uploadSound(TextChannel textChannel, List<Message.Attachment> attachments, String fileName, String bucketName, double lengthTime, int fileSize) {
-            if (attachments.isEmpty() || Objects.requireNonNull(attachments.get(0).getFileExtension()).compareTo("ogg") != 0) {
-                Bot.log(getLogType(), "no .ogg sound file is attached. Cannot continue");
-                textChannel.sendMessageEmbeds(new EmbedBuilder()
-                        .setColor(Color.red)
-                        .addField("No appropriate sound file attached", "Be sure a .ogg is attached. You can click here to see how by using Audacity: https://www.cedarville.edu/insights/computer-help/post/convert-audio-files", false)
-                        .build())
-                    .queue();
-            return false;
+        if (attachments.isEmpty() || Objects.requireNonNull(attachments.get(0).getFileExtension()).compareTo("ogg") != 0) {
+            Bot.log(getLogType(), "no .ogg sound file is attached. Cannot continue");
+            textChannel.sendMessageEmbeds(new EmbedBuilder()
+                    .setColor(Color.red)
+                    .addField("No appropriate sound file attached", "Be sure a .ogg is attached. You can click here to see how by using Audacity: https://www.cedarville.edu/insights/computer-help/post/convert-audio-files", false)
+                    .build())
+                .queue();
+        return false;
         }
 
         String address = attachments.get(0).getUrl().replaceAll("[?].+", "");

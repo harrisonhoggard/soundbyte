@@ -4,6 +4,7 @@ import events.util.EventObject;
 import bot.Bot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -18,6 +19,7 @@ import java.util.Random;
 public class MessageReact extends EventObject {
 
     private Guild guild;
+    private Member member;
 
     @Override
     public String getName() {
@@ -26,7 +28,7 @@ public class MessageReact extends EventObject {
 
     @Override
     public String getAction() {
-        return "message in guild \"" + guild.getName() + "\"";
+        return ("message from " + member.getEffectiveName());
     }
 
     @Override
@@ -38,9 +40,11 @@ public class MessageReact extends EventObject {
         try {
             guild = event.getGuild();
         } catch (IllegalStateException e) {
-            Bot.log(getLogType(), " message didn't come from guild.");
+            Bot.log(getLogType(), "Message didn't come from guild.");
             return;
         }
+
+        member = event.getMember();
 
         if (Objects.requireNonNull(event.getMember()).getUser().isBot())
             return;

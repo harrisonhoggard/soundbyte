@@ -69,7 +69,7 @@ public class UltraJS extends CommandObject {
             return;
         }
 
-        if (!JSHandler.uploadSound(textChannel, attachments, "ultraRare.ogg", guild.getId() + "-joinsounds", 40000.0, 800))
+        if (JSHandler.uploadSound(textChannel, attachments, "ultraRare.ogg", guild.getId() + "-joinsounds", 40000.0, 800))
         {
             details = "added a new ultra rare join sound";
             return;

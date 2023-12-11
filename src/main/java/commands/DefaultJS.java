@@ -69,7 +69,7 @@ public class DefaultJS extends CommandObject {
             return;
         }
 
-        if (!JSHandler.uploadSound(textChannel, attachments, "default.ogg", guild.getId() + "-joinsounds", 10000.0, 200))
+        if (JSHandler.uploadSound(textChannel, attachments, "default.ogg", guild.getId() + "-joinsounds", 10000.0, 200))
         {
             details = "added a new default join sound";
             return;
