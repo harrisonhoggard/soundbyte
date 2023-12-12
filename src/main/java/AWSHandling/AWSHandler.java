@@ -155,8 +155,14 @@ public class AWSHandler {
         ListObjectsV2Request request = ListObjectsV2Request.builder()
                 .bucket(fixedBucketName)
                 .build();
-
-        ListObjectsV2Response response = s3Client.listObjectsV2(request);
+        ListObjectsV2Response response = null;
+        try
+        {
+             response = s3Client.listObjectsV2(request);
+        } catch (NoSuchBucketException e) {
+            Bot.log(getLogType(), "Bucket \"" + bucketName + "\" does not exist. Cannot place \"" + objectName + "\" inside");
+            return false;
+        }
 
         for (S3Object s3Object : response.contents())
         {
