@@ -155,7 +155,7 @@ public class AWSHandler {
         ListObjectsV2Request request = ListObjectsV2Request.builder()
                 .bucket(fixedBucketName)
                 .build();
-        ListObjectsV2Response response = null;
+        ListObjectsV2Response response;
         try
         {
              response = s3Client.listObjectsV2(request);
