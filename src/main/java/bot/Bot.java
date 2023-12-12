@@ -209,21 +209,36 @@ public class Bot extends ListenerAdapter{
         boolean canTalk = false;
         TextChannel visibleChannel = null;
 
-        for (TextChannel channel : guild.getTextChannels()) {
-            if (channel.canTalk()) {
-                canTalk = true;
-                visibleChannel = channel;
-                break;
+        if (!aws.getItem("SoundByteServerList", "ServerID", guild.getId()).isEmpty())
+        {
+            if (aws.getItem("SoundByteServerList", "ServerID", guild.getId()).get("Default Channel") == null)
+            {
+                for (TextChannel channel : guild.getTextChannels())
+                {
+                    if (channel.canTalk()) {
+                        visibleChannel = channel;
+                        aws.updateTableItem("SoundByteServerList", "ServerID", guild.getId(), "Default Channel", visibleChannel.getId());
+                        break;
+                    }
+                }
             }
+            else
+                visibleChannel = guild.getTextChannelById(aws.getItem("SoundByteServerList", "ServerID", guild.getId()).get("Default Channel").s());
         }
 
-        if (!canTalk)
-        {
-            log(getLogType(), guild.getName() + ": cannot view channels. Sent dm to \"" + Objects.requireNonNull(guild.getOwner()).getEffectiveName() + "\"");
-            try {
-                final Message[] message = {null};
-                if (guild.getOwner().getUser().openPrivateChannel().complete().getLatestMessageId().isBlank()) {
-                    guild.getOwner().getUser().openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
+        else {
+            for (TextChannel channel : guild.getTextChannels()) {
+                if (channel.canTalk()) {
+                    canTalk = true;
+                    visibleChannel = channel;
+                    break;
+                }
+            }
+
+            if (!canTalk) {
+                try {
+                    final Message[] message = {null};
+                    Objects.requireNonNull(guild.getOwner()).getUser().openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
                                     .setColor(Color.cyan)
                                     .addField("**IMPORTANT** -- Insufficient permissions", "I don't have permission to view any channels." +
                                             " I will not be able to function properly or set up anything on my end. Please make sure that both" +
@@ -232,29 +247,32 @@ public class Bot extends ListenerAdapter{
                             .queue(m -> {
                                 message[0] = m;
                                 m.addReaction(Emoji.fromUnicode("✅")).queue();
+                                log(getLogType(), guild.getName() + ": cannot view channels. Sent dm to \"" + guild.getOwner().getEffectiveName() + "\"");
                             });
+                    eventWaiter.waitForEvent(
+                            MessageReactionAddEvent.class,
+                            e -> e.getMessageIdLong() == message[0].getIdLong() && !e.retrieveUser().complete().isBot(),
+                            e -> {
+                                log(getLogType(), guild.getName() + " owner reacted");
+                                guildInit(guild);
+                            }
+                    );
+                } catch (InsufficientPermissionException e) {
+                    log(getLogType(), "Could not private message " + Objects.requireNonNull(guild.getOwner()).getEffectiveName());
                 }
-                eventWaiter.waitForEvent(
-                        MessageReactionAddEvent.class,
-                        e -> e.getMessageIdLong() == message[0].getIdLong() && !e.retrieveUser().complete().isBot(),
-                        e -> {
-                            log(getLogType(), guild.getName() + " owner reacted");
-                            guildInit(guild);
-                        }
-                );
-            } catch (InsufficientPermissionException e) {
-                log(getLogType(), "Could not private message " + guild.getOwner().getEffectiveName());
+                return;
             }
-            return;
         }
 
         defaultChannels.put(guild, visibleChannel);
-        log(getLogType(), guild.getName() + ": set default channel to " + defaultChannels.get(guild).getName());
-        defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
-                    .setColor(Color.cyan)
-                    .addField("Channel chosen", "I will send messages in here, but you can change this by using **\"" + Config.get("COMMAND_PREFIX") + " channel\".", false)
-                    .build())
-                .queue();
+        log(getLogType(), guild.getName() + ": set default channel to " + defaultChannels.get(guild).getId());
+        if (aws.getItem("SoundByteServerList", "ServerID", guild.getId()).isEmpty()) {
+            defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
+                            .setColor(Color.cyan)
+                            .addField("Channel chosen", "I will send messages in here, but you can change this by using **\"" + Config.get("COMMAND_PREFIX") + " channel\"**.", false)
+                            .build())
+                    .queue(m -> log(getLogType(), "Notified guild " + guild.getName() + " which channel will be used."));
+        }
 
         if (guild.getRolesByName(Config.get("ADMIN_ROLE"), true).isEmpty())
         {
@@ -292,6 +310,7 @@ public class Bot extends ListenerAdapter{
         if (aws.getItem("SoundByteServerList", "ServerID", guild.getId()).isEmpty())
         {
             aws.addTableItem("SoundByteServerList", keys, keyVals);
+            aws.updateTableItem("SoundByteServerList", "ServerID", guild.getId(), "Default Channel", defaultChannels.get(guild).getId());
 
             defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                 .setColor(Color.cyan)
