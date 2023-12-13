@@ -112,9 +112,9 @@ public class RemoveJS extends CommandObject {
         Bot.aws.deleteObject(guild.getId() + "-joinsounds", user.getId() + ".ogg");
         textChannel.sendMessageEmbeds(new EmbedBuilder()
                 .setColor(Color.red)
-                .addField("Success", "Deleted join sound file for " + user.getAsMention(), false).build()).queue();
+                .addField("Success", "Deleted join sound file for " + member.getAsMention(), false).build()).queue();
 
-        details = "removed join sound for " + user.getEffectiveName();
+        details = "removed join sound for " + member.getEffectiveName();
         admin = false;
     }
 }
