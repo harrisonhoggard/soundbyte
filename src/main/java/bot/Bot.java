@@ -206,6 +206,7 @@ public class Bot extends ListenerAdapter{
         keys.add("ServerID");
         keyVals.add(guild.getId());
 
+        // Handles setting up the default channel that the bot can send messages
         boolean canTalk = false;
         TextChannel visibleChannel = null;
 
@@ -263,7 +264,6 @@ public class Bot extends ListenerAdapter{
                 return;
             }
         }
-
         defaultChannels.put(guild, visibleChannel);
         log(getLogType(), guild.getName() + ": set default channel to " + defaultChannels.get(guild).getId());
         if (aws.getItem("SoundByteServerList", "ServerID", guild.getId()).isEmpty()) {
@@ -274,11 +274,12 @@ public class Bot extends ListenerAdapter{
                     .queue(m -> log(getLogType(), "Notified guild " + guild.getName() + " which channel will be used."));
         }
 
+        // Handles the absence of an Admin role in a server
         if (guild.getRolesByName(Config.get("ADMIN_ROLE"), true).isEmpty())
         {
             if (guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES))
                 createAdminRole(guild);
-            else
+            else if (aws.getItem("SoundByteServerList", "ServerID", guild.getId()).isEmpty())
             {
                 log(getLogType(), guild.getName() + ": asked guild to either create role or let me do it for them");
                 defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
