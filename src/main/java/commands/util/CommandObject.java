@@ -56,6 +56,7 @@ public abstract class CommandObject {
         commands.put("ultrainfo", new Ultrarare());
         commands.put("test", new Test());
         commands.put("channel", new Channel());
+        commands.put("log", new Log());
 
         getTypes();
         Bot.log(getLogType(), "Commands successfully initialized");
