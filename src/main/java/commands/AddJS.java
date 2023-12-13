@@ -102,7 +102,7 @@ public class AddJS extends CommandObject {
 
         if (JSHandler.uploadSound(textChannel, attachments, user.getId() + ".ogg", guild.getId() + "-joinsounds", 10000.0, 200))
         {
-            details = "added join sound for " + user.getEffectiveName();
+            details = "added join sound for " + member.getEffectiveName();
             admin = false;
 
             return;
