@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Channel extends CommandObject {
+
+	private TextChannel defaultChannel;
+	
     @Override
     public String getName() {
         return "channel";
@@ -20,7 +23,7 @@ public class Channel extends CommandObject {
 
     @Override
     public String extraDetails() {
-        return "";
+        return "Set default channel to " + defaultChannel.getId();
     }
 
     @Override
@@ -41,7 +44,7 @@ public class Channel extends CommandObject {
 
     @Override
     public String getType() {
-        return "Basic";
+        return "Admin";
     }
 
     @Override
@@ -61,7 +64,6 @@ public class Channel extends CommandObject {
 
     @Override
     public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
-        TextChannel defaultChannel;
         if (arg.length < 3)
             defaultChannel = textChannel;
         else
@@ -69,8 +71,7 @@ public class Channel extends CommandObject {
 
         Bot.defaultChannels.put(guild, defaultChannel);
         Bot.aws.updateTableItem("SoundByteServerList", "ServerID", guild.getId(), "Default Channel", Bot.defaultChannels.get(guild).getId());
-        Bot.log(getLogType(), "Set default channel to " + Bot.defaultChannels.get(guild).getId());
-
+        
         textChannel.sendMessageEmbeds(new EmbedBuilder()
                     .setColor(Color.cyan)
                     .addField("Success", "Set my default channel to " + Bot.defaultChannels.get(guild).getName(), false)

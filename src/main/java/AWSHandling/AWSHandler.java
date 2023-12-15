@@ -160,16 +160,14 @@ public class AWSHandler {
         {
              response = s3Client.listObjectsV2(request);
         } catch (NoSuchBucketException e) {
-            Bot.log(getLogType(), "Bucket \"" + bucketName + "\" does not exist. Cannot place \"" + objectName + "\" inside");
+            Bot.log(getLogType(), "Bucket \"" + fixedBucketName + "\" does not exist.");
             return false;
         }
 
         for (S3Object s3Object : response.contents())
         {
             if (s3Object.key().contains(objectName))
-            {
                 return true;
-            }
         }
 
         Bot.log(getLogType(), objectName + " does not exist in bucket " + fixedBucketName);
