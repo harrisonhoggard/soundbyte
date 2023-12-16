@@ -51,8 +51,9 @@ public class UserTyping extends EventObject {
                         	.build())
         	            .queue();
         	}
+
+            devMessage(getName(), event.getUser().getEffectiveName() + " " + getAction(), guild);
         }
 
-        devMessage(getName(), event.getUser().getEffectiveName() + " " + getAction(), guild);
     }
 }
