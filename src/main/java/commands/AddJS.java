@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+// Assigns a custom join sound to a user
 public class AddJS extends CommandObject {
 
     private String details;
@@ -54,7 +55,7 @@ public class AddJS extends CommandObject {
 
     @Override
     public String getDesc() {
-        return "set a person's join sound (10 seconds or less)";
+        return "assign a person's join sound (10 seconds or less)";
     }
 
     @Override
@@ -69,6 +70,8 @@ public class AddJS extends CommandObject {
 
     @Override
     public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
+
+        // Determines if a user ID was included as an argument
         User user;
         try {
             user = Objects.requireNonNull(guild.getMemberById(arg[2].replaceAll("[<@>]", ""))).getUser();
@@ -97,6 +100,8 @@ public class AddJS extends CommandObject {
                         .build())
                     .queue();
             details = "admin privileges not possessed";
+            admin = false;
+
             return;
         }
 

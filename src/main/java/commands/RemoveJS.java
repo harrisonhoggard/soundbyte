@@ -95,6 +95,8 @@ public class RemoveJS extends CommandObject {
                             .build())
                     .queue();
             details = "admin privileges not possessed";
+            admin = false;
+
             return;
         }
 
@@ -106,6 +108,8 @@ public class RemoveJS extends CommandObject {
                             .build())
                     .queue();
             details = "sound file doesn't exist; cannot be removed";
+            admin = false;
+
             return;
         }
 
