@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-// Starts the shutdown process upon the owner executing the command from Discord
+// Starts the shutdown process upon the owner executing the command from Discord.
 public class Shutdown extends CommandObject {
 
     private String user;
@@ -51,7 +51,7 @@ public class Shutdown extends CommandObject {
     public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
         this.user = member.getEffectiveName();
 
-        super.devMessage(getName(), Arrays.toString(getArgs().toArray()).replaceAll("[\\[\\]]", ""), guild, user);
+        devMessage(getName(), Arrays.toString(getArgs().toArray()).replaceAll("[\\[\\]]", ""), guild, user);
 
         Bot.shutdown(textChannel);
     }

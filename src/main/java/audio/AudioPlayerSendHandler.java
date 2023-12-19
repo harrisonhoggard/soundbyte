@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.audio.AudioSendHandler;
 
 import java.nio.ByteBuffer;
 
+// Implemented from https://github.com/sedmelluq/lavaplayer?tab=readme-ov-file#jda-integration
 public class AudioPlayerSendHandler implements AudioSendHandler {
     private final AudioPlayer audioPlayer;
     private AudioFrame lastFrame;

@@ -6,7 +6,7 @@ import bot.Bot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 
-// Handles the deleting of stored information if a bot is removed from a guild.
+// Handles the deleting of a server's information if a bot is removed from said server.
 public class LeaveGuild extends EventObject {
     private Guild guild;
 

@@ -33,7 +33,7 @@ public class Join extends CommandObject {
         return args;
     }
 
-        public List<String> getArgInfo() {
+    public List<String> getArgInfo() {
         List<String> argInfo = new ArrayList<>();
         argInfo.add("name of voice channel");
 
@@ -69,6 +69,7 @@ public class Join extends CommandObject {
                     sb.append(" ");
             }
             channelName = sb.toString();
+
             try {
                 Bot.joinVc(guild, textChannel, guild.getVoiceChannelsByName(channelName, true).get(0));
             } catch (IndexOutOfBoundsException e) {

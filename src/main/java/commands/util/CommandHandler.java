@@ -12,34 +12,37 @@ import java.awt.*;
 import java.util.List;
 
 // Handles the parsing of commands and executing them. 
-public class DiscordHandler {
+public class CommandHandler {
 
 	// The name that is printed in the logger.
     private String getLogType() {
-        return "DISCORD-HANDLER";
+        return "COMMAND HANDLER";
     }
     
     // Parses commands, and determines whether user has privileges to use them.
-    public DiscordHandler(Guild guild, TextChannel textChannel, Member member, String [] arg, List<Message.Attachment> attachments)
+    public CommandHandler(Guild guild, TextChannel textChannel, Member member, String [] arg, List<Message.Attachment> attachments)
     {
         String cmd = arg[1];
 
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Commands: " + Config.get("COMMAND_PREFIX") + "<command>");
         eb.setColor(Color.cyan);
-        boolean commandFound = false;
 
         if (CommandObject.commands.containsKey(cmd))
         {
-            commandFound = true;
             CommandObject command = CommandObject.commands.get(cmd);
+
             if (command.adminPriv(member) && command.ownerPriv(member))
             {
                 command.execute(guild, member, textChannel, arg, attachments);
                 command.devMessage(command.getName(), command.extraDetails(), guild, member.getEffectiveName());
             }
             else if (guild.getRolesByName(Config.get("ADMIN_ROLE"), true).isEmpty())
-                return;
+            {
+                eb.addField(guild.getName() + ": " + Config.get("ADMIN_ROLE") + " role does not exist", "In order to execute this command, " +
+                        "a role called " + Config.get("ADMIN_ROLE") + " must be created. Make sure only trusted people have this role", false);
+                textChannel.sendMessageEmbeds(eb.setColor(Color.red).build()).queue();
+            }
             else
             {
                 eb.addField(guild.getName() + ": Permission denied", "You do not have the required \"" + Config.get("ADMIN_ROLE") +
@@ -48,8 +51,8 @@ public class DiscordHandler {
                 textChannel.sendMessageEmbeds(eb.setColor(Color.red).build()).queue();
             }
         }
-        
-        if (!commandFound) {
+        else
+        {
             Bot.log(getLogType(), guild.getName() + ": could not find command \"" + cmd + "\"");
             eb.addField(member.getEffectiveName(), "I don't know that command. Type in \"" + Config.get("COMMAND_PREFIX") +
                     " help\" for help on commands.", true);

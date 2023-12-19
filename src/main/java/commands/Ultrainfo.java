@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-// Retrieves information about a member, how many times they obtained, and last time they obtained the ultrarare role
-public class Ultrarare extends CommandObject {
+// Retrieves information about a member: how many times they obtained ultra-rare and the last time they got it.
+public class Ultrainfo extends CommandObject {
 
     private String memberName;
 
@@ -89,8 +89,7 @@ public class Ultrarare extends CommandObject {
             }
         }
 
-        assert memberToGet != null;
-        memberName = memberToGet.getEffectiveName();
+        memberName = Objects.requireNonNull(memberToGet).getEffectiveName();
 
         if (Bot.aws.getItem(tableName, "MemberID", memberToGet.getId()).isEmpty())
         {

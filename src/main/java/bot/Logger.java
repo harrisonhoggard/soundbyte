@@ -3,8 +3,8 @@ package bot;
 import java.io.*;
 
 // Customized logger that prints developer messages and Discord events to the console.
-// A string builder is used to assemble the printed messages, and at the end of each day, or when program closes, it prints the string to a log file. 
-// Log files get uploaded to the Logger Bucket in S3.
+// A string builder is used to assemble the printed messages, and at the end of each day, when program closes, or by command, it prints the string to a log file.
+// Log files get uploaded to the bot's log bucket in S3.
 public class Logger {
     private final StringBuilder sb;
     private File file;
@@ -43,14 +43,12 @@ public class Logger {
         if (!(dir.exists()))
         {
             log(getLogType(), "Making log directory at " + dir.getAbsolutePath());
-            //noinspection ResultOfMethodCallIgnored
             dir.mkdir();
         }
 
         if (!Bot.aws.downloadObject(Config.get("BOT_NAME") + "-logs", file.getName(), file.getPath()))
         {
             try {
-                //noinspection ResultOfMethodCallIgnored
                 file.createNewFile();
                 log(getLogType(), "Created " + file.getName() + " file at " + file.getAbsolutePath());
             } catch (IOException e) {

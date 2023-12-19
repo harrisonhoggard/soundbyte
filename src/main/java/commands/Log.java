@@ -12,6 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// Saves and uploads the log for the day so far.
 public class Log extends CommandObject {
     @Override
     public String getName() {

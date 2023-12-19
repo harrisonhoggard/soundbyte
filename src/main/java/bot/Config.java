@@ -9,6 +9,8 @@ import java.util.*;
 public class Config {
 
     // All the necessary information to initialize the bot.
+    // Do not change these! These will be retrieved in a private DynamoDB Table that you need to fill in manually!
+    //      The bot will create the table, you just need to fill in the info.
     private static final String TOKEN = "TOKEN";
     private static final String COMMAND_PREFIX = "COMMAND_PREFIX";
     private static final String ADMIN_ROLE = "ADMIN_ROLE";
@@ -66,6 +68,7 @@ public class Config {
 
         defaults = new HashMap<>();
 
+        // If table is missing any attribute, stop and let owner know. Otherwise, store values in Config variables
         for (Map<String, AttributeValue> item : response.items()) {
             if (item.get("Value").s().equals("null"))
             {
@@ -93,7 +96,8 @@ public class Config {
     public static String get(String key) {
         return defaults.get(key);
     }
-    
+
+    // Security and stuff
     public static void destroyToken() {
     	defaults.put(TOKEN, "");
     }

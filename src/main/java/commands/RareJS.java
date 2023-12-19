@@ -12,6 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// Allow server admins to upload a server's rare join sound.
 public class RareJS extends CommandObject {
 
     private String details;

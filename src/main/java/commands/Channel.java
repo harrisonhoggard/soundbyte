@@ -12,6 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// Allows server admins to change the channel the bot sends messages
 public class Channel extends CommandObject {
 
 	private TextChannel defaultChannel;

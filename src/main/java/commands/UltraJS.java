@@ -12,6 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// Allow server admins to assign their server's ultra-rare join sound.
 public class UltraJS extends CommandObject {
 
     private String details;

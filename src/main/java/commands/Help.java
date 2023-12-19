@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-// Prints out a list of commands, grouping them by their type.
+// Prints out either a list of commands grouped by their type, or a single specified command.
 public class Help extends CommandObject {
 
     private boolean isSingle = false;
@@ -129,7 +129,8 @@ public class Help extends CommandObject {
                     canPrint [0] = true;
                     sb.append("\n**").append(command.getName()).append("** ").append(Arrays.toString(command.getArgs().toArray()).replaceAll("[\\[\\]]", "")).append(": ").append(command.getDesc());
 
-                    for (String arg : command.getArgs()) {
+                    for (String arg : command.getArgs())
+                    {
                         sb.append("\n*    ").append(arg).append(": ").append(command.getArgInfo().get(command.getArgs().indexOf(arg)));
                     }
                 }

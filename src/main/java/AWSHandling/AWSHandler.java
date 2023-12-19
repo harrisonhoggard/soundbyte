@@ -68,10 +68,10 @@ public class AWSHandler {
         Bot.log(getLogType(), "Closed all AWS Clients");
     }
 
-	// MANUAL SETUP REQUIRED. Go to the AWS console and input the token under the secret's name ("DiscordRingtones" by default)
+	// MANUAL SETUP REQUIRED: Be sure you create an application in the Discord Developer Portal, and grab the API Token.
+    // Go to the AWS console and input the token under the secret's name ("DiscordRingtones" by default).
     // Retrieves the Discord API Token from AWS Secrets Manager.
     // Modified from example at https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/java_secrets-manager_code_examples.html
-    // > Get a token
     private String retrieveToken(String secret) {
         String key;
         GetSecretValueResponse valueResponse;
@@ -146,8 +146,10 @@ public class AWSHandler {
         } catch (BucketAlreadyOwnedByYouException e) {
             return;
         }
+
         Bot.log(getLogType(), fixedBucketName + " bucket was created");
     }
+
     // Determines if an object exists in a bucket.
     private boolean verifyBucketObject(String bucketName, String objectName) {
         String fixedBucketName = fixBucketName(bucketName);
@@ -156,8 +158,7 @@ public class AWSHandler {
                 .bucket(fixedBucketName)
                 .build();
         ListObjectsV2Response response;
-        try
-        {
+        try {
              response = s3Client.listObjectsV2(request);
         } catch (NoSuchBucketException e) {
             Bot.log(getLogType(), "Bucket \"" + fixedBucketName + "\" does not exist.");
@@ -174,6 +175,7 @@ public class AWSHandler {
         return false;
     }
 
+    // Retrieves the URL needed to access a specific object
     public String getObjectUrl(String bucketName, String objectName) {
         String fixedBucketName = fixBucketName(bucketName);
         return "https://" + fixedBucketName + ".s3." + region.toString() + ".amazonaws.com/" + objectName;
@@ -212,6 +214,7 @@ public class AWSHandler {
         return downloadObject(manager, bucketName, fileName, downloadFilePath);
     }
 
+    // Removes all objects from a bucket, then deletes said bucket
     public void deleteBucket(String bucketName) {
         String fixedBucketName = fixBucketName(bucketName);
 
@@ -249,6 +252,7 @@ public class AWSHandler {
         Bot.log(getLogType(), "Deleted bucket " + fixedBucketName);
     }
 
+    // Returns all the objects in a bucket
     private List<S3Object> listBucketObjects(String bucketName) {
         ListObjectsV2Request request = ListObjectsV2Request.builder()
                 .bucket(bucketName)
@@ -340,10 +344,12 @@ public class AWSHandler {
                 .attributeType("S")
                 .build());
 
-        for (String tableName : tableNames) {
+        for (String tableName : tableNames)
+        {
             boolean result = verifyDynamoTable(DescribeTableRequest.builder().tableName(tableName).build());
 
-            if (!result) {
+            if (!result)
+            {
                 Bot.log(getLogType(), tableName + " table does not exist, creating now...");
                 createTable(tableName, tableAttributes.get(tableName));
                 Bot.log(getLogType(), tableName + " table was created");
@@ -351,13 +357,12 @@ public class AWSHandler {
         }
     }
 
-    // Verifies whether the DynamoDB Tables exist or not.
+    // Verifies whether a DynamoDB Tables exists or not.
     private boolean verifyDynamoTable(DescribeTableRequest request) {
         try {
             dynamoDbClient.describeTable(request);
             return true;
-        } catch (ResourceNotFoundException e)
-        {
+        } catch (ResourceNotFoundException e) {
             return false;
         }
     }
@@ -384,6 +389,7 @@ public class AWSHandler {
         Bot.log(getLogType(), "Successfully added items to " + tableName);
     }
 
+    // Removes an item from a table
     public void deleteTableItem(String tableName, String key, String keyVal) {
 
         if (!verifyDynamoTable(tableName))
@@ -412,7 +418,7 @@ public class AWSHandler {
         Bot.log(getLogType(), "Deleted item " + keyVal + " from table " + tableName);
     }
 
-    // Scans a table and returns the response. Responses are analyzed for the data outside this method to make things simpler.
+    // Scans a table and returns the response. The data in these responses are processed outside this method to make things simpler.
     public ScanResponse scanItems(String tableName) {
 
         ScanRequest request = ScanRequest.builder()
@@ -502,6 +508,7 @@ public class AWSHandler {
         createTable(tableName, tableAttributes);
     }
 
+    // Removes a table
     public void deleteTable(String tableName) {
 
         if (!verifyDynamoTable(tableName))

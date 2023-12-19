@@ -64,6 +64,7 @@ public class MessageReact extends EventObject {
         if (item == null)
             return;
 
+        // There is a chance attribute for each response. If you want the bot to respond to a message everytime, set "Chance" to 1.
         Random rand = new Random();
         int randomInt = rand.nextInt(Integer.parseInt(item.get("Chance").n())) + 1;
 

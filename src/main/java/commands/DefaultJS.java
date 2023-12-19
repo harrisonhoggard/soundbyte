@@ -12,6 +12,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// Assigns a server's default join sound different from the bot's default
 public class DefaultJS extends CommandObject {
 
     private String details;
@@ -62,7 +63,7 @@ public class DefaultJS extends CommandObject {
         {
             textChannel.sendMessageEmbeds(new EmbedBuilder()
                             .setColor(Color.red)
-                            .addField("Wrong format", "Remove any argument after \"default\"", false)
+                            .addField("Wrong format", "Remove any argument after **\"default\"**", false)
                             .build())
                     .queue();
             details = "wrong format used";

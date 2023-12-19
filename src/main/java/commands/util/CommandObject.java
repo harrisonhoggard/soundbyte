@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
-// The blueprint for commands, which are each their own object. Their initialization is contained here.
+// The blueprint for commands. Their initialization is contained here.
 public abstract class CommandObject {
 
     public static Map<String, List<CommandObject>> types;
@@ -43,33 +43,33 @@ public abstract class CommandObject {
         types = new HashMap<>();
         commands = new HashMap<>();
 
+        // Add any new commands to the hash map here
         commands.put("help", new Help());
         commands.put("shutdown", new Shutdown());
         commands.put("join", new Join());
         commands.put("leave", new Leave());
-        // commands.put("lines", new Lines());
+        commands.put("lines", new Lines());
         commands.put("add", new AddJS());
         commands.put("remove", new RemoveJS());
         commands.put("default", new DefaultJS());
         commands.put("rare", new RareJS());
         commands.put("ultra", new UltraJS());
-        commands.put("ultrainfo", new Ultrarare());
+        commands.put("ultrainfo", new Ultrainfo());
         commands.put("test", new Test());
         commands.put("channel", new Channel());
         commands.put("log", new Log());
 
-        getTypes();
+        initTypes();
         Bot.log(getLogType(), "Commands successfully initialized");
     }
 
 	// Each command has a category (type) associated with it. This "types" map is initialized here.
 	// The map initialized here is used when calling the help command, which prints commands grouped by their type.
-    private static void getTypes() {
+    private static void initTypes() {
         commands.forEach((commandName, command) -> {
             if (!types.containsKey(command.getType()))
-            {
                 types.put(command.getType(), new ArrayList<>());
-            }
+            
             types.get(command.getType()).add(command);
 
         });
@@ -87,6 +87,7 @@ public abstract class CommandObject {
 
             if (getAdmin())
                 return member.getRoles().contains(adminRole);
+
             return true;
         } catch (IndexOutOfBoundsException e) {
             Bot.defaultChannels.get(member.getGuild()).sendMessageEmbeds(new EmbedBuilder()
@@ -103,6 +104,7 @@ public abstract class CommandObject {
     public boolean ownerPriv(Member member) {
         if (getOwner())
             return (member.getId().compareTo(Config.get("OWNER_ID")) == 0);
+
         return true;
     }
 }

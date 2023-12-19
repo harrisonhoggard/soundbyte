@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+// Allows me to test any features I want to add
 public class Test extends CommandObject {
     @Override
     public String getName() {
@@ -54,6 +55,7 @@ public class Test extends CommandObject {
         return true;
     }
 
+    // CURRENTLY: Testing time based reactions
     @Override
     public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
         textChannel.sendMessageEmbeds(new EmbedBuilder()

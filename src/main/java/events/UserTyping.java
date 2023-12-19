@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.util.Random;
 
-// Very small chance to call someone out for typing in Discord
+// Very small chance to call someone out for typing in a text channel.
 public class UserTyping extends EventObject {
     private Guild guild;
 
@@ -37,7 +37,8 @@ public class UserTyping extends EventObject {
         Random rand = new Random();
         int randomInt = rand.nextInt(1000);
         
-        if (randomInt < 1) {
+        if (randomInt < 1)
+        {
 			try {
         	    event.getChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
                 	        .setColor(Color.cyan)

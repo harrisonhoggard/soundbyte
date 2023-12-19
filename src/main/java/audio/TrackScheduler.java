@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+// Influenced by example at https://github.com/sedmelluq/lavaplayer/blob/707771af705b14ecc0c0ca4b5e5b6546e85f4b1c/demo-jda/src/main/java/com/sedmelluq/discord/lavaplayer/demo/jda/TrackScheduler.java
 public class TrackScheduler extends AudioEventAdapter {
     public final AudioPlayer player;
     private final BlockingQueue<AudioTrack> queue;

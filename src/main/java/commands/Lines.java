@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-// Would return the number of lines in the code. I only used this for dev purposes (and to show off lol)
+// Returns the number of lines in the code. I only used this for dev purposes (and to show off lol)
 public class Lines extends CommandObject {
 
     private static int linesOfCode = 0;
@@ -80,6 +80,7 @@ public class Lines extends CommandObject {
                 .queue();
     }
 
+    // Adapted from my past project called "botTemplate"
     public void recursiveFunction(File [] file, int i) {
         // If there are no more files, stop the current recursive incident
         if (i == file.length)
@@ -87,9 +88,8 @@ public class Lines extends CommandObject {
 
         // If file is a folder, recursively look at the files inside
         if (file[i].isDirectory())
-        {
             recursiveFunction(Objects.requireNonNull(file[i].listFiles()), 0);
-        }
+
         // If file is not a folder, increment number of files and count the lines of code
         else
         {

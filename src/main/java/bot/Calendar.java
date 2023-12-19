@@ -49,9 +49,7 @@ public class Calendar implements Runnable{
 			});
 
 			if (Bot.getLocalTime().getHour() == LocalTime.MIDNIGHT.getHour())
-			{
 				Bot.writeLog();
-			}
 
 		} while (true);
 	}

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-// Removes any bucket objects and/or table entries associated with the member that left a guild.
+// Removes any bucket objects and/or table entries associated with the member that left a server.
 public class MemberLeaveGuild extends EventObject {
 
     private Guild guild;

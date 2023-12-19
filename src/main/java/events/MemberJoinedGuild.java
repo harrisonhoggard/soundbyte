@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 
 import java.awt.*;
 
-// Welcomes new users to servers.
+// Welcomes new members to a server.
 public class MemberJoinedGuild extends EventObject {
     private Guild guild;
 

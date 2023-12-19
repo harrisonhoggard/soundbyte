@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-// Handles whenever a user joins a voice channel or disconnects from a channel.
+// Handler for whenever a user joins a voice channel or disconnects from a channel.
 public class VoiceStateUpdate extends EventObject {
 
     private Guild guild;
@@ -63,6 +63,7 @@ public class VoiceStateUpdate extends EventObject {
 
         URL url;
         try {
+            // Ultra-rare
             if (randomInt < 1)
             {
                 Bot.defaultChannels.get(event.getGuild()).sendMessageEmbeds(new EmbedBuilder()
@@ -102,12 +103,14 @@ public class VoiceStateUpdate extends EventObject {
                 tableName = "SoundByteServerList";
                 Bot.aws.updateTableItem(tableName, "ServerID", guild.getId(), "Current Ultra", event.getMember().getId());
             }
+            // Rare
             else if (randomInt < 50)
             {
                 url = new URL(Bot.aws.getObjectUrl(guild.getId() + "-joinsounds", "rare.ogg"));
 
                 PlayerManager.getInstance().getMusicManager(guild).audioPlayer.setVolume(60);
             }
+            // Default
             else {
                 if (Bot.aws.verifyObject(guild.getId() + "-joinsounds", event.getMember().getId() + ".ogg"))
                     url = new URL(Bot.aws.getObjectUrl(guild.getId() + "-joinsounds", event.getMember().getId() + ".ogg"));
@@ -127,7 +130,7 @@ public class VoiceStateUpdate extends EventObject {
         devMessage(getName(),event.getMember().getEffectiveName() + " joined " + getAction() + " played " + url.getFile().replace("/", ""), getGuild());
     }
 
-    // When everyone human user leaves a voice channel, the bot closes the connection as well.
+    // When every human user leaves a voice channel, the bot closes the connection as well.
     private void leaveHandler(GuildVoiceUpdateEvent event) {
         VoiceChannel channelLeft;
 

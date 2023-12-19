@@ -16,6 +16,8 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
+// Handles the playing of audio files in each guild
+// Influenced from examples at https://github.com/sedmelluq/lavaplayer/tree/707771af705b14ecc0c0ca4b5e5b6546e85f4b1c?tab=readme-ov-file#creating-an-audio-player-manager
 public class PlayerManager {
     private static PlayerManager INSTANCE;
     private final AudioPlayerManager audioPlayerManager;
