@@ -29,7 +29,7 @@ public class JSHandler {
             Bot.log(getLogType(), "no .ogg sound file is attached. Cannot continue");
             textChannel.sendMessageEmbeds(new EmbedBuilder()
                     .setColor(Color.red)
-                    .addField("No appropriate sound file attached", "Be sure a .ogg is attached. You can click here to see how by using Audacity: https://www.cedarville.edu/insights/computer-help/post/convert-audio-files", false)
+                    .addField("No appropriate sound file attached", "Be sure a .ogg is attached. You can click [here](https://www.cedarville.edu/insights/computer-help/post/convert-audio-files) to see how by using Audacity", false)
                     .build())
                 .queue();
 

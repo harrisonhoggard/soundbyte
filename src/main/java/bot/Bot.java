@@ -337,8 +337,8 @@ public class Bot extends ListenerAdapter{
                                 .setColor(Color.cyan)
                                 .addField("Commands", "In order to upload a sound, just type in **\"" + Config.get("COMMAND_PREFIX") +
                                         " add\"**, and then attach a sound file with the extension **\".ogg\"** in the same message. " +
-                                        "If you're not sure how to convert a sound file, just click on this link to learn how to use Audacity to do" +
-                                        " [this](https://www.cedarville.edu/insights/computer-help/post/convert-audio-files).", false)
+                                        "If you're not sure how to convert a sound file, just click on [this](https://www.cedarville.edu/insights/computer-help/post/convert-audio-files) link to learn how to use Audacity to do" +
+                                        " this.", false)
                                 .build())
                             .queue(message3 -> {
                                 try {
@@ -416,6 +416,8 @@ public class Bot extends ListenerAdapter{
                         .build())
                     .queue(message -> log(getLogType(), guild.getName() + ": Initialization complete"));
         }
+
+        log(getLogType(), guild.getName() + ": initialized guild with " + guild.getMembers().size() + " members.");
 
         keys.clear();
         keyVals.clear();
