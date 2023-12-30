@@ -53,7 +53,7 @@ public class CommandHandler {
         }
         else
         {
-            Bot.log(getLogType(), guild.getName() + ": could not find command \"" + cmd + "\"");
+            Bot.log(getLogType(), guild.getId() + ": could not find command \"" + cmd + "\"");
             eb.addField(member.getEffectiveName(), "I don't know that command. Type in \"" + Config.get("COMMAND_PREFIX") +
                     " help\" for help on commands.", true);
             textChannel.sendMessageEmbeds(eb.setColor(Color.red).build()).queue();

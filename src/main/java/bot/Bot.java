@@ -171,7 +171,7 @@ public class Bot extends ListenerAdapter{
                     .setMentionable(true)
                     .complete();
 
-            log(getLogType(), "Created " + Config.get("ADMIN_ROLE") + " role in guild " + guild.getName());
+            log(getLogType(), "Created " + Config.get("ADMIN_ROLE") + " role in guild " + guild.getId());
 
             defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                             .setColor(Color.green)
@@ -193,7 +193,7 @@ public class Bot extends ListenerAdapter{
                             .build())
                     .queue();
 
-            log(getLogType(), guild.getName() + " created the " + Config.get("ADMIN_ROLE") + " role.");
+            log(getLogType(), guild.getId() + " created the " + Config.get("ADMIN_ROLE") + " role.");
         }
     }
 
@@ -250,13 +250,13 @@ public class Bot extends ListenerAdapter{
                             .queue(m -> {
                                 message[0] = m;
                                 m.addReaction(Emoji.fromUnicode("✅")).queue();
-                                log(getLogType(), guild.getName() + ": cannot view channels. Sent dm to \"" + guild.getOwner().getEffectiveName() + "\"");
+                                log(getLogType(), guild.getId() + ": cannot view channels. Sent dm to \"" + guild.getOwner().getId() + "\"");
                             });
                     eventWaiter.waitForEvent(
                             MessageReactionAddEvent.class,
                             e -> e.getMessageIdLong() == message[0].getIdLong() && !e.retrieveUser().complete().isBot(),
                             e -> {
-                                log(getLogType(), guild.getName() + " owner reacted");
+                                log(getLogType(), guild.getId() + " owner reacted");
                                 guildInit(guild);
                             }
                     );
@@ -267,14 +267,14 @@ public class Bot extends ListenerAdapter{
             }
         }
         defaultChannels.put(guild, visibleChannel);
-        log(getLogType(), guild.getName() + ": set default channel to " + defaultChannels.get(guild).getId());
+        log(getLogType(), guild.getId() + ": set default channel to " + defaultChannels.get(guild).getId());
         if (aws.getItem("SoundByteServerList", "ServerID", guild.getId()).isEmpty())
         {
             defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                             .setColor(Color.cyan)
                             .addField("Channel chosen", "I will send messages in here, but you can change this by using **\"" + Config.get("COMMAND_PREFIX") + " channel\"**.", false)
                             .build())
-                    .queue(m -> log(getLogType(), "Notified guild " + guild.getName() + " which channel will be used."));
+                    .queue(m -> log(getLogType(), "Notified guild " + guild.getId() + " which channel will be used."));
         }
 
         // Handles the absence of an Admin role in a server
@@ -284,7 +284,7 @@ public class Bot extends ListenerAdapter{
                 createAdminRole(guild);
             else if (aws.getItem("SoundByteServerList", "ServerID", guild.getId()).isEmpty())
             {
-                log(getLogType(), guild.getName() + ": asked guild to either create role or let me do it for them");
+                log(getLogType(), guild.getId() + ": asked guild to either create role or let me do it for them");
                 defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                             .setColor(Color.red)
                             .addField("No " + Config.get("ADMIN_ROLE") + " role is present", "Some commands require a role named \"" +
@@ -366,7 +366,7 @@ public class Bot extends ListenerAdapter{
                                                         .addField("Contact", "If you have any questions, or need to report any problems, feel free to contact me at " +
                                                                 "**\"crispycrusaderdev@gmail.com\"**", false)
                                                         .build())
-                                                    .queue(message6 -> log(getLogType(), guild.getName() + ": Sent tutorial"));
+                                                    .queue(message6 -> log(getLogType(), guild.getId() + ": Sent tutorial"));
                                                 } catch (InterruptedException e) {
                                                     throw new RuntimeException(e);
                                                 }
@@ -414,10 +414,10 @@ public class Bot extends ListenerAdapter{
                         .setColor(Color.green)
                         .addField("Initialization completed", "You can now use me. Type in \"" + Config.get("COMMAND_PREFIX") + " help\" to get started.", false)
                         .build())
-                    .queue(message -> log(getLogType(), guild.getName() + ": Initialization complete"));
+                    .queue(message -> log(getLogType(), guild.getId() + ": Initialization complete"));
         }
 
-        log(getLogType(), guild.getName() + ": initialized guild with " + guild.getMembers().size() + " members.");
+        log(getLogType(), guild.getId() + ": initialized guild with " + guild.getMembers().size() + " members.");
 
         keys.clear();
         keyVals.clear();

@@ -77,7 +77,7 @@ public abstract class CommandObject {
     
     // The developer message that gets logged after each command executes.
     public void devMessage(String name, String details, Guild guild, String member) {
-        Bot.log(getLogType(), guild.getName() + ": " + member + " executed " + name + "; " + details);
+        Bot.log(getLogType(), guild.getId() + ": " + member + " executed " + name + "; " + details);
     }
 
     // Determines whether a user has access to admin privileged commands.

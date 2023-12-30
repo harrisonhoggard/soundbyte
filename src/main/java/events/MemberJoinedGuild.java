@@ -19,7 +19,7 @@ public class MemberJoinedGuild extends EventObject {
 
     @Override
     public String getAction() {
-        return "joined the guild";
+        return "joined the guild; now at " + guild.getMembers().size() + " members.";
     }
 
     @Override

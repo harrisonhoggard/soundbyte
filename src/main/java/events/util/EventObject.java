@@ -33,6 +33,6 @@ public abstract class EventObject extends ListenerAdapter {
     }
 
     public void devMessage(String name, String action, Guild guild) {
-        Bot.log(getLogType(), guild.getName() + ": executed " + name + ": " + action + ";");
+        Bot.log(getLogType(), guild.getId() + ": executed " + name + ": " + action + ";");
     }
 }

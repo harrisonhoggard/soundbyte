@@ -48,7 +48,7 @@ public class PlayerManager {
     // usually it would not even play any audio. Removing the guild manager from the map fixes this.
     public void removeGuildManager(Guild guild) {
         musicManagers.remove(guild.getIdLong());
-        Bot.log(getLogType(), "Removed " + guild.getName() + "'s music manager");
+        Bot.log(getLogType(), "Removed " + guild.getId() + "'s music manager");
     }
 
     public void loadAndPlay(AudioChannel channel, String path) {

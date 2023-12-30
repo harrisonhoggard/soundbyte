@@ -20,7 +20,7 @@ public class MemberLeaveGuild extends EventObject {
 
     @Override
     public String getAction() {
-        return "left the guild";
+        return "left the guild; now at " + guild.getMembers().size() + " members.";
     }
 
     @Override
