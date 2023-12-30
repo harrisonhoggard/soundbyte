@@ -49,7 +49,7 @@ public class Lines extends CommandObject {
 
     @Override
     public String getDesc() {
-        return "returns the number of lines of code";
+        return "works only from IDE";
     }
 
     @Override
