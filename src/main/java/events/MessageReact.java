@@ -44,6 +44,10 @@ public class MessageReact extends EventObject {
             return;
         }
 
+        // Some bot profiles are null(?) accounts, and it results in a NullPointerException when they send messages. This fixes it.
+        if (event.getMember() == null)
+            return;
+
         member = event.getMember();
 
         if (Objects.requireNonNull(event.getMember()).getUser().isBot())

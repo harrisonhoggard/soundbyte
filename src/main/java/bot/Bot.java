@@ -468,13 +468,17 @@ public class Bot extends ListenerAdapter{
             return;
         }
         TextChannel textChannel = event.getChannel().asTextChannel();
+
+        // Some bot profiles are null(?) accounts, and it results in a NullPointerException when they send messages. This fixes it.
+        if (event.getMember() == null)
+            return;
+
         Member member = event.getMember();
 
         List<Message.Attachment> attachments = event.getMessage().getAttachments();
 
         String [] arg = message.split(" ");
 
-        assert member != null;
         if (!member.getUser().isBot())
         {
             if (arg[0].compareTo(Config.get("COMMAND_PREFIX")) == 0)
