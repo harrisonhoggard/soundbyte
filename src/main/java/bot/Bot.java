@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -455,6 +456,9 @@ public class Bot extends ListenerAdapter{
 
     // When a command is sent, it gets caught here and calls the Handler object to parse.
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        if (!event.getChannelType().equals(ChannelType.TEXT))
+            return;
+
         String message = event.getMessage().getContentRaw();
         Guild guild;
         try {
@@ -469,6 +473,7 @@ public class Bot extends ListenerAdapter{
         List<Message.Attachment> attachments = event.getMessage().getAttachments();
 
         String [] arg = message.split(" ");
+
         assert member != null;
         if (!member.getUser().isBot())
         {

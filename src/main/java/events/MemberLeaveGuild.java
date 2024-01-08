@@ -29,6 +29,9 @@ public class MemberLeaveGuild extends EventObject {
     }
 
     public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
+        if (event.getUser().isBot())
+            return;
+
         guild = event.getGuild();
 
         if (Bot.aws.verifyObject(guild.getId() + "-joinsounds", Objects.requireNonNull(event.getMember()).getId() + ".ogg"))
