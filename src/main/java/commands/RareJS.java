@@ -70,7 +70,7 @@ public class RareJS extends CommandObject {
             return;
         }
 
-        if (JSHandler.uploadSound(textChannel, attachments, "rare.ogg", guild.getId() + "-joinsounds", 15000.0, 350))
+        if (JSHandler.uploadSound(textChannel, attachments, "rare.ogg", guild.getId() + "-joinsounds", 15000.0, 3000))
         {
             details = "added a new rare join sound";
             return;
