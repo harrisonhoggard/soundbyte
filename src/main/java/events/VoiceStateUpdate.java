@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
 import java.awt.*;
 import java.net.MalformedURLException;
@@ -56,7 +57,11 @@ public class VoiceStateUpdate extends EventObject {
         VoiceChannel channelJoined = Objects.requireNonNull(event.getChannelJoined()).asVoiceChannel();
 
         if (!guild.getAudioManager().isConnected())
-            guild.getAudioManager().openAudioConnection(channelJoined);
+            try {
+                guild.getAudioManager().openAudioConnection(channelJoined);
+            } catch (InsufficientPermissionException e) {
+                return;
+            }
 
         Random rand = new Random();
         int randomInt = rand.nextInt(1000);
