@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 // Welcomes new members to a server.
 public class MemberJoinedGuild extends EventObject {
     private Guild guild;
+    String details = "";
 
     @Override
     public String getName() {
@@ -18,7 +19,7 @@ public class MemberJoinedGuild extends EventObject {
 
     @Override
     public String getAction() {
-        return "joined the guild; now at " + guild.getMembers().size() + " members.";
+        return "joined the guild; now at " + guild.getMembers().size() + " members; " + details;
     }
 
     @Override
@@ -42,6 +43,7 @@ public class MemberJoinedGuild extends EventObject {
                                     Config.get("COMMAND_PREFIX") + "\"** help to get started. \n\nTo invite me to your server, find me on Top.gg")
                         .build()))
                     .queue();
+            details = "welcomed new member";
         }
 
         devMessage(getName(), event.getMember().getEffectiveName() + " " + getAction(), getGuild());
