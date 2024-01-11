@@ -337,9 +337,7 @@ public class Bot extends ListenerAdapter{
                             defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                                 .setColor(Color.cyan)
                                 .addField("Commands", "In order to upload a sound, just type in **\"" + Config.get("COMMAND_PREFIX") +
-                                        " add\"**, and then attach a sound file with the extension **\".ogg\"** in the same message. " +
-                                        "If you're not sure how to convert a sound file, just click on [this](https://www.cedarville.edu/insights/computer-help/post/convert-audio-files) link to learn how to use Audacity to do" +
-                                        " this.", false)
+                                        " add\"**, and then attach a supported sound file in the same message.", false)
                                 .build())
                             .queue(message3 -> {
                                 try {
@@ -357,7 +355,7 @@ public class Bot extends ListenerAdapter{
                                                 .setColor(Color.cyan)
                                                 .addField("Rare and Ultra-rare", "There are two other tiers of sounds: a rare, and an ultra-rare. " +
                                                         "These are special sounds that play randomly, and can also be customized for your server. Just use **\"" +
-                                                        Config.get("COMMAND_PREFIX") + " rare\"** and **\"" + Config.get("COMMAND_PREFIX") + " ultra\"** with an attached .ogg sound file to change them.", false)
+                                                        Config.get("COMMAND_PREFIX") + " rare\"** and **\"" + Config.get("COMMAND_PREFIX") + " ultra\"** with an attached sound file to change them.", false)
                                                 .build())
                                             .queue(message5 -> {
                                                 try {
