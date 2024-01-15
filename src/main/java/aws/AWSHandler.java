@@ -1,4 +1,4 @@
-package AWSHandling;
+package aws;
 
 import bot.Bot;
 import org.apache.commons.lang3.StringUtils;
