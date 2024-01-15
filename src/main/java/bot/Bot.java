@@ -1,6 +1,6 @@
 package bot;
 
-import AWSHandling.AWSHandler;
+import aws.AWSHandler;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import commands.util.CommandObject;
 import commands.util.CommandHandler;
@@ -13,10 +13,10 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -123,6 +123,8 @@ public class Bot extends ListenerAdapter{
         new Calendar();
 
         jda.addEventListener(this);
+
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtException());
 
         return true;
     }
@@ -241,28 +243,26 @@ public class Bot extends ListenerAdapter{
 
             if (!canTalk) {
                 try {
-                    final Message[] message = {null};
                     Objects.requireNonNull(guild.getOwner()).getUser().openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
                                     .setColor(Color.red)
                                     .addField("**IMPORTANT** -- Insufficient permissions", "I don't have permission to view any channels." +
                                             " I will not be able to function properly or set up anything on my end. Please make sure that both" +
-                                            " a text and voice channel are viewable for me, and click the green check when this is done.", false)
+                                            " a text and voice channel are viewable for me, and react to this message with any emoji when this is done.", false)
                                     .build()))
-                            .queue(m -> {
-                                message[0] = m;
-                                m.addReaction(Emoji.fromUnicode("✅")).queue();
-                                log(getLogType(), guild.getId() + ": cannot view channels. Sent dm to \"" + guild.getOwner().getId() + "\"");
-                            });
+                            .complete();
+
+                    log(getLogType(), guild.getId() + ": cannot view channels. Sent dm to \"" + guild.getOwner().getId() + "\"");
+
                     eventWaiter.waitForEvent(
                             MessageReactionAddEvent.class,
-                            e -> e.getMessageIdLong() == message[0].getIdLong() && !e.retrieveUser().complete().isBot(),
+                            e -> !e.isFromGuild() && !e.retrieveUser().complete().isBot(),
                             e -> {
                                 log(getLogType(), guild.getId() + " owner reacted");
                                 guildInit(guild);
                             }
                     );
-                } catch (InsufficientPermissionException e) {
-                    log(getLogType(), "Could not private message " + Objects.requireNonNull(guild.getOwner()).getEffectiveName());
+                } catch (InsufficientPermissionException | ErrorResponseException e) {
+                    log(getLogType(), "Could not private message " + Objects.requireNonNull(guild.getOwner()).getId());
                 }
                 return;
             }
