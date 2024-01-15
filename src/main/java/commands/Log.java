@@ -1,6 +1,7 @@
 package commands;
 
 import bot.Bot;
+import bot.Config;
 import commands.util.CommandObject;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -60,7 +61,7 @@ public class Log extends CommandObject {
         Bot.writeLog();
         textChannel.sendMessageEmbeds(new EmbedBuilder()
                     .setColor(Color.cyan)
-                    .addField("Log Saved", Bot.getDate() + ".log was saved.", false)
+                    .addField("Log Saved", "[" + Bot.getDate() + ".log](" + Bot.aws.getObjectUrl(Config.get("BOT_NAME") + "-logs", Bot.getDate() + ".log") + ") was saved.", false)
                     .build())
                 .queue();
     }
