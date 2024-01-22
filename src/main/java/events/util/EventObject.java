@@ -26,6 +26,7 @@ public abstract class EventObject extends ListenerAdapter {
         Bot.jda.addEventListener(new MemberJoinedGuild());
         Bot.jda.addEventListener(new MemberLeaveGuild());
         Bot.jda.addEventListener(new VoiceStateUpdate());
+        Bot.jda.addEventListener(new DefaultChannelDelete());
 
         TimedEvent.initTimedEvents();
 

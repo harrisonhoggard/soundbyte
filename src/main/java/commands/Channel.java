@@ -74,7 +74,7 @@ public class Channel extends CommandObject {
         Bot.aws.updateTableItem("SoundByteServerList", "ServerID", guild.getId(), "Default Channel", Bot.defaultChannels.get(guild).getId());
         
         textChannel.sendMessageEmbeds(new EmbedBuilder()
-                    .setColor(Color.cyan)
+                    .setColor(Color.green)
                     .addField("Success", "Set my default channel to " + Bot.defaultChannels.get(guild).getName(), false)
                     .build())
                 .queue();

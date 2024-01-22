@@ -262,13 +262,15 @@ public class Bot extends ListenerAdapter{
                             }
                     );
                 } catch (InsufficientPermissionException | ErrorResponseException e) {
-                    log(getLogType(), "Could not private message " + Objects.requireNonNull(guild.getOwner()).getId());
+                    log(getLogType(), "Could not private message " + Objects.requireNonNull(guild.getOwner()).getId() + " from guild " + guild.getId());
                 }
                 return;
             }
         }
+
         defaultChannels.put(guild, visibleChannel);
         log(getLogType(), guild.getId() + ": set default channel to " + defaultChannels.get(guild).getId());
+
         if (aws.getItem("SoundByteServerList", "ServerID", guild.getId()).isEmpty())
         {
             defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
@@ -457,15 +459,9 @@ public class Bot extends ListenerAdapter{
         if (!event.getChannelType().equals(ChannelType.TEXT))
             return;
 
-        String message = event.getMessage().getContentRaw();
-        Guild guild;
-        try {
-            guild = event.getGuild();
-        } catch (IllegalStateException e) {
-            Bot.log(getLogType(), "Message from " + Objects.requireNonNull(event.getMember()).getEffectiveName() + " didn't come from guild.");
-            return;
-        }
+        Guild guild = event.getGuild();
         TextChannel textChannel = event.getChannel().asTextChannel();
+        String message = event.getMessage().getContentRaw();
 
         // Some bot profiles are null(?) accounts, and it results in a NullPointerException when they send messages. This fixes it.
         if (event.getMember() == null)
