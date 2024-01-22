@@ -5,6 +5,7 @@ import bot.Bot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -37,10 +38,27 @@ public class MessageReact extends EventObject {
     }
 
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        try {
-            guild = event.getGuild();
-        } catch (IllegalStateException e) {
-            Bot.log(getLogType(), "Message didn't come from guild.");
+
+        if (event.getAuthor().isBot())
+            return;
+
+        if (!event.getMessage().isFromGuild())
+        {
+            Bot.log(getLogType(), "Direct message from " + Objects.requireNonNull(event.getAuthor().getEffectiveName()) + ": \"" + event.getMessage().getContentRaw() + "\"");
+            event.getChannel().asPrivateChannel().sendMessageEmbeds(new EmbedBuilder()
+                            .setColor(Color.cyan)
+                            .setDescription("Hello " + event.getAuthor().getEffectiveName() + ", " +
+                                    "\n\nIf you want to invite me to your server, click on the link in my profile description.")
+                            .build())
+                    .queue();
+            return;
+        }
+
+        guild = event.getGuild();
+
+        if (!event.getChannelType().equals(ChannelType.TEXT))
+        {
+            Bot.log(getLogType(), guild.getId() +  ": Message " + event.getMessageId() + " came from channel type \"" + event.getChannelType() + "\"");
             return;
         }
 
