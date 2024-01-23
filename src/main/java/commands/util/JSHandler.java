@@ -112,8 +112,6 @@ public class JSHandler {
             }
         }
 
-        // TODO: Check length of video when it's from YouTube.
-
         if (calculateDuration(target) >= lengthTime)
         {
             textChannel.sendMessageEmbeds(new EmbedBuilder()
