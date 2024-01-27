@@ -50,7 +50,7 @@ public class Channel extends CommandObject {
 
     @Override
     public String getDesc() {
-        return "change the default channel I talk in";
+        return "change the channel I send messages to";
     }
 
     @Override

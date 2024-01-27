@@ -45,7 +45,7 @@ public class Join extends CommandObject {
     }
 
     public String getDesc() {
-        return "connects bot to occupied or specified voice channel";
+        return "connects bot to a voice channel";
     }
 
     public boolean getAdmin() {
