@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ public class AddJS extends CommandObject {
     }
 
     @Override
-    public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
+    public void execute(Guild guild, Member member, MessageChannel channel, String[] arg, List<Message.Attachment> attachments) {
 
         // Determines if a user ID was included as an argument
         User user;
@@ -78,7 +78,7 @@ public class AddJS extends CommandObject {
         } catch (ArrayIndexOutOfBoundsException e) {
             user = member.getUser();
         } catch (NumberFormatException e) {
-            textChannel.sendMessageEmbeds(new EmbedBuilder()
+            channel.sendMessageEmbeds(new EmbedBuilder()
                             .setColor(Color.red)
                             .addField("Wrong format", "Be sure you use the mention for a person" +
                                     "\n- Example: \"" + Config.get("COMMAND_PREFIX") + " " + getName() + " " + member.getAsMention() + "\"", false)
@@ -94,7 +94,7 @@ public class AddJS extends CommandObject {
         if (!adminPriv(member))
         {
             Bot.log(getLogType(), member.getEffectiveName() + " cannot execute add");
-            textChannel.sendMessageEmbeds(new EmbedBuilder()
+            channel.sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.red)
                         .addField("Permission denied", "You need to have the role: \"" + Config.get("ADMIN_ROLE") + "\" to use add on someone else.", false)
                         .build())
@@ -105,7 +105,7 @@ public class AddJS extends CommandObject {
             return;
         }
 
-        if (JSHandler.uploadSound(textChannel, attachments, user.getId() + ".ogg", guild.getId() + "-joinsounds", 10000.0, 1800))
+        if (JSHandler.uploadSound(channel, attachments, user.getId() + ".ogg", guild.getId() + "-joinsounds", 10000.0, 1800))
         {
             details = "added join sound for " + member.getEffectiveName();
             admin = false;

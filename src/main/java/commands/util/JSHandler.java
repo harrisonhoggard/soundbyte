@@ -7,7 +7,7 @@ import it.sauronsoftware.jave.EncoderException;
 import it.sauronsoftware.jave.EncodingAttributes;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.apache.commons.io.FileUtils;
 
 import java.awt.*;
@@ -29,11 +29,11 @@ public class JSHandler {
 
     // Method that is called when uploading a sound file to the appropriate bucket
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static boolean uploadSound(TextChannel textChannel, List<Message.Attachment> attachments, String fileName, String bucketName, double lengthTime, int fileSize) {
+    public static boolean uploadSound(MessageChannel channel, List<Message.Attachment> attachments, String fileName, String bucketName, double lengthTime, int fileSize) {
         if (attachments.isEmpty())
         {
             Bot.log(getLogType(), "no sound file is attached. Cannot continue");
-            textChannel.sendMessageEmbeds(new EmbedBuilder()
+            channel.sendMessageEmbeds(new EmbedBuilder()
                     .setColor(Color.red)
                     .addField("No appropriate sound file attached", "Supported file types are: \n* .ogg\n* .mp3\n* .mp4\n* .wav\n* .wma", false)
                     .build())
@@ -52,7 +52,7 @@ public class JSHandler {
             if ((urlConnection.getContentLengthLong() / 1024) > fileSize)
             {
                 Bot.log(getLogType(), "File " + sourceFile.getName() + " size is too big: " + (urlConnection.getContentLengthLong() / 1024) + " KB");
-                textChannel.sendMessageEmbeds(new EmbedBuilder()
+                channel.sendMessageEmbeds(new EmbedBuilder()
                             .setColor(Color.red)
                             .addField("Failure", "The file size is too big. Be sure to send a sound file less than " + fileSize + " KB in size."
                                     + "\n\nSupported file types are: \n* .ogg\n* .mp3\n* .mp4\n* .wav\n* .wma", false)
@@ -103,7 +103,8 @@ public class JSHandler {
             default:
             {
                 Bot.log(getLogType(), "file attached was a \"." + attachments.get(0).getFileExtension() + "\" file; aborting");
-                textChannel.sendMessageEmbeds(new EmbedBuilder()
+                channel.sendMessageEmbeds(new EmbedBuilder()
+                                .setColor(Color.red)
                                 .addField("Wrong file format", "Supported file types are: \n* .ogg\n* .mp3\n* .mp4\n* .wav\n* .wma", false).build())
                         .queue();
                 //noinspection ResultOfMethodCallIgnored
@@ -114,7 +115,7 @@ public class JSHandler {
 
         if (calculateDuration(target) >= lengthTime)
         {
-            textChannel.sendMessageEmbeds(new EmbedBuilder()
+            channel.sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.red)
                         .addField("Failure", "The join sound length of time was too long. Be sure to send a file less than " + lengthTime / 1000 + " seconds.", false)
                         .build())
@@ -125,7 +126,7 @@ public class JSHandler {
         }
         else
         {
-            textChannel.sendMessageEmbeds(new EmbedBuilder()
+            channel.sendMessageEmbeds(new EmbedBuilder()
                             .setColor(Color.green)
                             .addField("Success", "The join sound has been set", false)
                             .build())

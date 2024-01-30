@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -66,14 +66,14 @@ public class RemoveJS extends CommandObject {
     }
 
     @Override
-    public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
+    public void execute(Guild guild, Member member, MessageChannel channel, String[] arg, List<Message.Attachment> attachments) {
         User user;
         try {
             user = Objects.requireNonNull(guild.getMemberById(arg[2].replaceAll("[<@>]", ""))).getUser();
         } catch (ArrayIndexOutOfBoundsException e) {
             user = member.getUser();
         } catch (NumberFormatException e) {
-            textChannel.sendMessageEmbeds(new EmbedBuilder()
+            channel.sendMessageEmbeds(new EmbedBuilder()
                             .setColor(Color.red)
                             .addField("Wrong format", "Be sure you use the mention for a person" +
                                     "\n- Example: \"" + Config.get("COMMAND_PREFIX") + " " + getName() + " " + member.getAsMention() + "\"", false)
@@ -89,7 +89,7 @@ public class RemoveJS extends CommandObject {
         if (!adminPriv(member))
         {
             Bot.log(getLogType(), member.getEffectiveName() + " cannot execute remove");
-            textChannel.sendMessageEmbeds(new EmbedBuilder()
+            channel.sendMessageEmbeds(new EmbedBuilder()
                             .setColor(Color.red)
                             .addField("Permission denied", "You need to have the role: \"" + Config.get("ADMIN_ROLE") + "\" to use remove on someone else.", false)
                             .build())
@@ -102,7 +102,7 @@ public class RemoveJS extends CommandObject {
 
         if (!Bot.aws.verifyObject(guild.getId() + "-joinsounds", user.getId() + ".ogg"))
         {
-            textChannel.sendMessageEmbeds(new EmbedBuilder()
+            channel.sendMessageEmbeds(new EmbedBuilder()
                             .setColor(Color.red)
                             .addField("Failure", "Cannot delete sound file, because it does not exist", false)
                             .build())
@@ -114,8 +114,8 @@ public class RemoveJS extends CommandObject {
         }
 
         Bot.aws.deleteObject(guild.getId() + "-joinsounds", user.getId() + ".ogg");
-        textChannel.sendMessageEmbeds(new EmbedBuilder()
-                .setColor(Color.red)
+        channel.sendMessageEmbeds(new EmbedBuilder()
+                .setColor(Color.green)
                 .addField("Success", "Deleted join sound file for " + member.getAsMention(), false).build()).queue();
 
         details = "removed join sound for " + member.getEffectiveName();

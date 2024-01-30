@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -56,10 +56,10 @@ public class Log extends CommandObject {
     }
 
     @Override
-    public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
+    public void execute(Guild guild, Member member, MessageChannel channel, String[] arg, List<Message.Attachment> attachments) {
         Bot.log(getLogType(), "Saving log by command");
         Bot.writeLog();
-        textChannel.sendMessageEmbeds(new EmbedBuilder()
+        channel.sendMessageEmbeds(new EmbedBuilder()
                     .setColor(Color.cyan)
                     .addField("Log Saved", "[" + Bot.getDate() + ".log](" + Bot.aws.getObjectUrl(Config.get("BOT_NAME") + "-logs", Bot.getDate() + ".log") + ") was saved.", false)
                     .build())

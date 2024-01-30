@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -58,10 +58,10 @@ public class UltraJS extends CommandObject {
     }
 
     @Override
-    public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
+    public void execute(Guild guild, Member member, MessageChannel channel, String[] arg, List<Message.Attachment> attachments) {
         if (arg.length >= 3)
         {
-            textChannel.sendMessageEmbeds(new EmbedBuilder()
+            channel.sendMessageEmbeds(new EmbedBuilder()
                             .setColor(Color.red)
                             .addField("Wrong format", "Remove any argument after \"ultra\"", false)
                             .build())
@@ -70,7 +70,7 @@ public class UltraJS extends CommandObject {
             return;
         }
 
-        if (JSHandler.uploadSound(textChannel, attachments, "ultraRare.ogg", guild.getId() + "-joinsounds", 40000.0, 7000))
+        if (JSHandler.uploadSound(channel, attachments, "ultraRare.ogg", guild.getId() + "-joinsounds", 40000.0, 7000))
         {
             details = "added a new ultra rare join sound";
             return;

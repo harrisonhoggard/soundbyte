@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -87,7 +88,7 @@ public class Bot extends ListenerAdapter{
     }
 
     // Initializes the JDA variable and everything else required for the bot to run.
-    private boolean startBot() throws InterruptedException {
+    private boolean startBot() {
     	if (Config.get("TOKEN").isEmpty())
             return false;
 
@@ -105,7 +106,11 @@ public class Bot extends ListenerAdapter{
             return false;
         }
 
-        jda.awaitReady();
+        try {
+            jda.awaitReady();
+        } catch (InterruptedException e) {
+            Bot.log(getLogType(), "JDA could not start");
+        }
 
         Config.destroyToken();
 
@@ -123,8 +128,6 @@ public class Bot extends ListenerAdapter{
         new Calendar();
 
         jda.addEventListener(this);
-
-        Thread.setDefaultUncaughtExceptionHandler(new UncaughtException());
 
         return true;
     }
@@ -425,29 +428,29 @@ public class Bot extends ListenerAdapter{
     }
 
     // Static call for joining a voice channel.
-    public static void joinVc(Guild guild, TextChannel textChannel, VoiceChannel voiceChannel) {
+    public static void joinVc(Guild guild, MessageChannel channel, VoiceChannel voiceChannel) {
         AudioManager audioManager = guild.getAudioManager();
 
         if (audioManager.isConnected() && Objects.requireNonNull(audioManager.getConnectedChannel()).asVoiceChannel().equals(voiceChannel))
         {
-            textChannel.sendMessageEmbeds(new EmbedBuilder().addField("", "Already connected to voice channel \"" + voiceChannel.getName() + "\"", false).setColor(Color.yellow).build()).queue();
+            channel.sendMessageEmbeds(new EmbedBuilder().addField("", "Already connected to voice channel \"" + voiceChannel.getName() + "\"", false).setColor(Color.yellow).build()).queue();
             return;
         }
 
         try {
             audioManager.openAudioConnection(voiceChannel);
         } catch(Exception e) {
-            textChannel.sendMessageEmbeds(new EmbedBuilder().addField("", "Could not join voice channel \"" + voiceChannel.getName(), false).setColor(Color.red).build()).queue();
+            channel.sendMessageEmbeds(new EmbedBuilder().addField("", "Could not join voice channel \"" + voiceChannel.getName(), false).setColor(Color.red).build()).queue();
         }
     }
 
     // Static call for leaving a voice channel.
-    public static void leaveVc(Guild guild, TextChannel textChannel) {
+    public static void leaveVc(Guild guild, MessageChannel channel) {
         AudioManager audioManager = guild.getAudioManager();
 
         if (!audioManager.isConnected())
         {
-            textChannel.sendMessageEmbeds(new EmbedBuilder().addField("Not connected", "I'm not currently in a voice channel", false).setColor(Color.red).build()).queue();
+            channel.sendMessageEmbeds(new EmbedBuilder().addField("Not connected", "I'm not currently in a voice channel", false).setColor(Color.red).build()).queue();
             return;
         }
 
@@ -456,11 +459,11 @@ public class Bot extends ListenerAdapter{
 
     // When a command is sent, it gets caught here and calls the Handler object to parse.
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (!event.getChannelType().equals(ChannelType.TEXT))
+        if (!event.getChannelType().equals(ChannelType.TEXT) && !event.getChannelType().equals(ChannelType.VOICE))
             return;
 
         Guild guild = event.getGuild();
-        TextChannel textChannel = event.getChannel().asTextChannel();
+        MessageChannel channel = event.getChannel();
         String message = event.getMessage().getContentRaw();
 
         // Some bot profiles are null(?) accounts, and it results in a NullPointerException when they send messages. This fixes it.
@@ -477,17 +480,17 @@ public class Bot extends ListenerAdapter{
         {
             if (arg[0].compareTo(Config.get("COMMAND_PREFIX")) == 0)
             {
-                new CommandHandler(guild, textChannel, member, arg, attachments);
+                new CommandHandler(guild, channel, member, arg, attachments);
             }
         }
     }
 
     // Static call to shut down the program (only the bot owner can execute the command that calls this method).
-    public static void shutdown(TextChannel textChannel) {
+    public static void shutdown(MessageChannel channel, Member member) {
         EmbedBuilder eb = new EmbedBuilder();
-        eb.addField(Objects.requireNonNull(textChannel.getGuild().getMemberById(Config.get("OWNER_ID"))).getEffectiveName(), "Shutting down now", true).setColor(Color.cyan);
+        eb.addField(member.getEffectiveName(), "Shutting down now", true).setColor(Color.cyan);
 
-        textChannel.sendMessageEmbeds(eb.build()).complete();
+        channel.sendMessageEmbeds(eb.build()).complete();
 
         shutdown();
     }
@@ -533,7 +536,9 @@ public class Bot extends ListenerAdapter{
     }
 
     // Main and stuff.
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
+
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtException());
 
         Bot bot = new Bot();
 

@@ -5,7 +5,7 @@ import bot.Bot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,11 +48,11 @@ public class Shutdown extends CommandObject {
         return true;
     }
 
-    public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
+    public void execute(Guild guild, Member member, MessageChannel channel, String[] arg, List<Message.Attachment> attachments) {
         this.user = member.getEffectiveName();
 
         devMessage(getName(), Arrays.toString(getArgs().toArray()).replaceAll("[\\[\\]]", ""), guild, user);
 
-        Bot.shutdown(textChannel);
+        Bot.shutdown(channel, member);
     }
 }

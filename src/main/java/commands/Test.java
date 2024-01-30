@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 import java.awt.*;
@@ -57,8 +57,8 @@ public class Test extends CommandObject {
 
     // CURRENTLY: Testing time based reactions
     @Override
-    public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
-        textChannel.sendMessageEmbeds(new EmbedBuilder()
+    public void execute(Guild guild, Member member, MessageChannel channel, String[] arg, List<Message.Attachment> attachments) {
+        channel.sendMessageEmbeds(new EmbedBuilder()
                     .setColor(Color.cyan)
                     .addField("Test 1", "Testing a timer", false)
                     .build())

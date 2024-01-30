@@ -6,17 +6,19 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 // Allows server admins to change the channel the bot sends messages
-public class Channel extends CommandObject {
+public class DefaultChannel extends CommandObject {
 
-	private TextChannel defaultChannel;
-	
+	private Guild guild;
+
     @Override
     public String getName() {
         return "channel";
@@ -24,7 +26,11 @@ public class Channel extends CommandObject {
 
     @Override
     public String extraDetails() {
-        return "Set default channel to " + defaultChannel.getId();
+        try {
+            return "Set default channel to " + Bot.defaultChannels.get(guild).getId();
+        } catch (NullPointerException e) {
+            return "Rejected request to set voice channel to default channel";
+        }
     }
 
     @Override
@@ -64,16 +70,31 @@ public class Channel extends CommandObject {
     }
 
     @Override
-    public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
+    public void execute(Guild guild, Member member, MessageChannel channel, String[] arg, List<Message.Attachment> attachments) {
+
+        if (!channel.getType().equals(ChannelType.TEXT))
+        {
+            channel.sendMessageEmbeds(new EmbedBuilder()
+                        .setColor(Color.red)
+                        .addField("Invalid Channel Type", "Make sure the channel you want to make default is a text channel and not a voice channel." , false)
+                        .build())
+                    .queue();
+            return;
+        }
+
+        TextChannel defaultChannel;
+        this.guild = guild;
+
         if (arg.length < 3)
-            defaultChannel = textChannel;
+            defaultChannel = guild.getTextChannelById(channel.getId());
         else
             defaultChannel = guild.getTextChannelById(arg[2]);
 
         Bot.defaultChannels.put(guild, defaultChannel);
         Bot.aws.updateTableItem("SoundByteServerList", "ServerID", guild.getId(), "Default Channel", Bot.defaultChannels.get(guild).getId());
-        
-        textChannel.sendMessageEmbeds(new EmbedBuilder()
+
+        assert defaultChannel != null;
+        defaultChannel.sendMessageEmbeds(new EmbedBuilder()
                     .setColor(Color.green)
                     .addField("Success", "Set my default channel to " + Bot.defaultChannels.get(guild).getName(), false)
                     .build())

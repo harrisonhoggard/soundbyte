@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -23,6 +23,8 @@ public class Join extends CommandObject {
     }
 
     public String extraDetails() {
+        if (channelName == null)
+            return "no channel name entered";
         return "bot joined channel \"" + channelName + "\"";
     }
 
@@ -57,7 +59,7 @@ public class Join extends CommandObject {
     }
 
 	// Determines if a voice channel name was specified. If so, join that channel, otherwise join the channel the user is in currently.
-    public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
+    public void execute(Guild guild, Member member, MessageChannel channel, String[] arg, List<Message.Attachment> attachments) {
         if (arg.length > 2)
         {
             StringBuilder sb = new StringBuilder();
@@ -71,10 +73,10 @@ public class Join extends CommandObject {
             channelName = sb.toString();
 
             try {
-                Bot.joinVc(guild, textChannel, guild.getVoiceChannelsByName(channelName, true).get(0));
+                Bot.joinVc(guild, channel, guild.getVoiceChannelsByName(channelName, true).get(0));
             } catch (IndexOutOfBoundsException e) {
                 Bot.log(CommandObject.getLogType(), "voice channel \"" + channelName + "\" doesn't exist");
-                textChannel.sendMessageEmbeds(new EmbedBuilder().addField("Unknown Voice Channel",
+                channel.sendMessageEmbeds(new EmbedBuilder().addField("Unknown Voice Channel",
                         "\"" + channelName + "\" doesn't exist as a voice channel",
                         false)
                         .setColor(Color.red)
@@ -83,8 +85,16 @@ public class Join extends CommandObject {
         }
         else
         {
-            channelName = Objects.requireNonNull(Objects.requireNonNull(member.getVoiceState()).getChannel()).getName();
-            Bot.joinVc(guild, textChannel, member.getVoiceState().getChannel().asVoiceChannel());
+            try {
+                channelName = Objects.requireNonNull(Objects.requireNonNull(member.getVoiceState()).getChannel()).getName();
+                Bot.joinVc(guild, channel, member.getVoiceState().getChannel().asVoiceChannel());
+            } catch (NullPointerException e) {
+                channel.sendMessageEmbeds(new EmbedBuilder()
+                            .setColor(Color.red)
+                            .addField("No specified channel", "Be sure to either include the name of the channel, or join a voice channel and try the command again.", false)
+                            .build())
+                        .queue();
+            }
         }
     }
 }

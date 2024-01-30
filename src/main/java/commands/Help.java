@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class Help extends CommandObject {
     }
 
 	// Before printing, determines whether one single command needs to printed, or all of them. 
-    public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
+    public void execute(Guild guild, Member member, MessageChannel channel, String[] arg, List<Message.Attachment> attachments) {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Commands: " + Config.get("COMMAND_PREFIX") + " <command>");
         eb.setColor(Color.cyan);
@@ -71,7 +71,7 @@ public class Help extends CommandObject {
         else
             allEmbedBuild(member, eb);
 
-        textChannel.sendMessageEmbeds(eb.build()).queue();
+        channel.sendMessageEmbeds(eb.build()).queue();
     }
 
     // Prints a specified command if the user has access to it.

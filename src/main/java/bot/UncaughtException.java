@@ -4,7 +4,7 @@ package bot;
 public class UncaughtException implements Thread.UncaughtExceptionHandler {
 
     public UncaughtException() {
-        Bot.log(getLogType(), "Started UncaughtExceptionHandler");
+
     }
 
     private String getLogType() {

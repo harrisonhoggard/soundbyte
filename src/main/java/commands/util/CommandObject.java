@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 // The blueprint for commands. Their initialization is contained here.
 public abstract class CommandObject {
@@ -31,7 +31,7 @@ public abstract class CommandObject {
     public abstract boolean getOwner();
 
 	// Blueprint for each command's execution.
-    public abstract void execute(Guild guild, Member member, TextChannel textChannel, String [] arg, List<Message.Attachment> attachments);
+    public abstract void execute(Guild guild, Member member, MessageChannel channel, String [] arg, List<Message.Attachment> attachments);
 
 	// The name that is printed in the logger.
     public static String getLogType() {
@@ -56,7 +56,7 @@ public abstract class CommandObject {
         commands.put("ultra", new UltraJS());
         commands.put("ultrainfo", new Ultrainfo());
         commands.put("test", new Test());
-        commands.put("channel", new Channel());
+        commands.put("channel", new DefaultChannel());
         commands.put("log", new Log());
 
         initTypes();

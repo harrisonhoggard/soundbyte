@@ -56,7 +56,7 @@ public class MessageReact extends EventObject {
 
         guild = event.getGuild();
 
-        if (!event.getChannelType().equals(ChannelType.TEXT))
+        if (!event.getChannelType().equals(ChannelType.TEXT) && !event.getChannelType().equals(ChannelType.VOICE))
         {
             Bot.log(getLogType(), guild.getId() +  ": Message " + event.getMessageId() + " came from channel type \"" + event.getChannelType() + "\"");
             return;
@@ -95,7 +95,7 @@ public class MessageReact extends EventObject {
 
         if (item.get("Reaction") != null)
         {
-            event.getChannel().asTextChannel().sendMessageEmbeds(new EmbedBuilder()
+            event.getChannel().sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.cyan)
                         .addField("Dear " + event.getMember().getEffectiveName() + ":", item.get("Reaction").s(), false)
                         .build())
@@ -105,7 +105,7 @@ public class MessageReact extends EventObject {
         }
         if (item.get("Send photo") != null && item.get("Send photo").s().compareTo("true") == 0)
         {
-            event.getChannel().asTextChannel().sendMessage(item.get("Photo path").s()).queue();
+            event.getChannel().sendMessage(item.get("Photo path").s()).queue();
             devMessage(getName(), "Sent a photo reacting to \"" + item.get("Prompt").s() + "\" " + getAction(), getGuild());
         }
     }

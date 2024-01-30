@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -67,7 +67,7 @@ public class Ultrainfo extends CommandObject {
 
     // Retrieves information from the guild's ultrarare DynamoDB table
     @Override
-    public void execute(Guild guild, Member member, TextChannel textChannel, String[] arg, List<Message.Attachment> attachments) {
+    public void execute(Guild guild, Member member, MessageChannel channel, String[] arg, List<Message.Attachment> attachments) {
         String tableName = guild.getId() + "-ultrarare";
         String currentHolder;
         Member memberToGet;
@@ -79,7 +79,7 @@ public class Ultrainfo extends CommandObject {
             try {
                 memberToGet = guild.getMemberById(arg[2].replaceAll("[<@>]", ""));
             } catch (NumberFormatException e) {
-                textChannel.sendMessageEmbeds(new EmbedBuilder()
+                channel.sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.red)
                         .addField("Wrong format", "Be sure you use the mention for a person" +
                                 "\n- Example: \"" + Config.get("COMMAND_PREFIX") + " ultra " + member.getAsMention() + "\"", false)
@@ -121,7 +121,7 @@ public class Ultrainfo extends CommandObject {
         else
             currentHolder = Objects.requireNonNull(guild.getMemberById(currentHolder)).getAsMention();
 
-        textChannel.sendMessageEmbeds(new EmbedBuilder()
+        channel.sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.green)
                         .addField("Ultra Rare: " + memberToGet.getEffectiveName(),
                                 "Times obtained: " + amount + "\n"
