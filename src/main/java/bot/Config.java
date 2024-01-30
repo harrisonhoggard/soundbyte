@@ -79,7 +79,7 @@ public class Config {
         }
 
 		// This is the secret's name that is stored in AWS Secrets Manager. This will need to be changed for your own secret.
-        defaults.put(TOKEN, Bot.aws.getToken("GaryFrog"));
+        defaults.put(TOKEN, Bot.aws.getToken("DiscordRingtones"));
     }
 
 	// Helper method for setting up the attributes in the Bot Info table.
