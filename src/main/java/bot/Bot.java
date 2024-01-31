@@ -40,7 +40,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 // Main method contained here. Responsible for initialization of everything, as well as storing all the helper methods that are needed throughout the entire program.
 public class Bot extends ListenerAdapter{
@@ -323,74 +322,33 @@ public class Bot extends ListenerAdapter{
             aws.updateTableItem("SoundByteServerList", "ServerID", guild.getId(), "Default Channel", defaultChannels.get(guild).getId());
 
             defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
-                .setColor(Color.cyan)
-                .addField("**!!! IMPORTANT !!! **", "Give me about 30 seconds to setup everything before using commands. " +
-                        "I'll send some information here in the meantime, and let you know when I'm ready.", false)
-                .build())
-            .queue(message -> {
-                try {
-                    TimeUnit.SECONDS.sleep(5);
-                    defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
+                            .setColor(Color.yellow)
+                            .addField("**!!! IMPORTANT !!! **", "Give me about 30 seconds to setup everything before using commands. " +
+                                    "I'll send some information here in the meantime, and let you know when I'm ready.", false)
+                            .build())
+                    .queue();
+
+            defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
                         .setColor(Color.cyan)
-                        .addField(Config.get("BOT_NAME"), "I am capable of playing short sounds over voice chat whenever someone connects to a channel. " +
+                        .setTitle("About me")
+                        .setDescription("I am capable of playing short sounds over voice chat whenever someone connects to a channel. " +
                                 "There are default sounds that apply to everyone, but you can customize them if you want. To get started, just type in **\"" + Config.get("COMMAND_PREFIX") +
-                                " help\"** for more information.", false)
+                                " help\"** for more information." +
+                                "\n\nIn order to upload a sound, just type in **\"" + Config.get("COMMAND_PREFIX") + " add\"**, and then attach a supported sound file in the same message." +
+                                "\nYou can also remove with **\"" + Config.get("COMMAND_PREFIX") + " remove\"**, " +
+                                "and you can add other people's sounds if you have the **\"" + Config.get("ADMIN_ROLE") + "\"** role by entering **\"" +
+                                Config.get("COMMAND_PREFIX") + " add @someone\"**. You can also remove sounds the same way." +
+                                "\n\nYou can also remove with **\"" + Config.get("COMMAND_PREFIX") + " remove\"**, " +
+                                "and you can add other people's sounds if you have the **\"" + Config.get("ADMIN_ROLE") + "\"** role by entering **\"" +
+                                Config.get("COMMAND_PREFIX") + " add @someone\"**. You can also remove sounds the same way.")
                         .build())
-                    .queue(message2 -> {
-                        try {
-                            TimeUnit.SECONDS.sleep(2);
-                            defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
-                                .setColor(Color.cyan)
-                                .addField("Commands", "In order to upload a sound, just type in **\"" + Config.get("COMMAND_PREFIX") +
-                                        " add\"**, and then attach a supported sound file in the same message.", false)
-                                .build())
-                            .queue(message3 -> {
-                                try {
-                                    TimeUnit.SECONDS.sleep(2);
-                                    defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
-                                        .setColor(Color.cyan)
-                                        .addField("Commands (cont.)", "You can also remove with **\"" + Config.get("COMMAND_PREFIX") + " remove\"**, " +
-                                                "and you can add other people's sounds if you have the **\"" + Config.get("ADMIN_ROLE") + "\"** role by entering **\"" +
-                                                Config.get("COMMAND_PREFIX") + " add @someone\"**. You can also remove sounds the same way.", false)
-                                        .build())
-                                    .queue(message4 -> {
-                                        try {
-                                            TimeUnit.SECONDS.sleep(2);
-                                            defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
-                                                .setColor(Color.cyan)
-                                                .addField("Rare and Ultra-rare", "There are two other tiers of sounds: a rare, and an ultra-rare. " +
-                                                        "These are special sounds that play randomly, and can also be customized for your server. Just use **\"" +
-                                                        Config.get("COMMAND_PREFIX") + " rare\"** and **\"" + Config.get("COMMAND_PREFIX") + " ultra\"** with an attached sound file to change them.", false)
-                                                .build())
-                                            .queue(message5 -> {
-                                                try {
-                                                    TimeUnit.SECONDS.sleep(2);
-                                                    defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
-                                                        .setColor(Color.cyan)
-                                                        .addField("Contact", "If you have any questions, or need to report any problems, feel free to contact me at " +
-                                                                "**\"crispycrusaderdev@gmail.com\"**", false)
-                                                        .build())
-                                                    .queue(message6 -> log(getLogType(), guild.getId() + ": Sent tutorial"));
-                                                } catch (InterruptedException e) {
-                                                    throw new RuntimeException(e);
-                                                }
-                                            });
-                                        } catch (InterruptedException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    });
-                                } catch (InterruptedException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            });
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+                    .queue();
+            defaultChannels.get(guild).sendMessageEmbeds(new EmbedBuilder()
+                        .setColor(Color.cyan)
+                        .addField("Contact", "If you have any questions, or need to report any problems, feel free to contact me at " +
+                                "**\"crispycrusaderdev@gmail.com\"**", false)
+                        .build())
+                    .queue();
         }
 
         // Creates each guild's join sound bucket if it does not yet exist.
