@@ -5,6 +5,7 @@ import events.util.EventObject;
 import bot.Bot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
@@ -146,14 +147,18 @@ public class VoiceStateUpdate extends EventObject {
             return;
         }
 
-        final boolean[] isEmpty = {true};
+        boolean isEmpty = true;
 
-        channelLeft.getMembers().forEach(member -> {
+        for (Member member : channelLeft.getMembers())
+        {
             if (!member.getUser().isBot())
-                isEmpty[0] = false;
-        });
+            {
+                isEmpty = false;
+                break;
+            }
+        }
 
-        if (isEmpty[0])
+        if (isEmpty)
             guild.getAudioManager().closeAudioConnection();
 
         devMessage(getName(), event.getMember().getEffectiveName() + " left " + getAction(), getGuild());
