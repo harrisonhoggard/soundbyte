@@ -42,7 +42,7 @@ public class JSHandler {
             return false;
         }
 
-        String address = attachments.get(0).getUrl().replaceAll("[?].+", "");
+        String address = attachments.get(0).getUrl();
         URL url;
         File sourceFile = new File("downloads/tempSoundFile." + attachments.get(0).getFileExtension());
         try {
@@ -80,6 +80,8 @@ public class JSHandler {
             {
                 AudioAttributes audio = new AudioAttributes();
                 audio.setCodec("vorbis");
+                audio.setBitRate(320);
+                audio.setSamplingRate(44100);
                 EncodingAttributes attrs = new EncodingAttributes();
                 attrs.setFormat("ogg");
                 attrs.setAudioAttributes(audio);
@@ -87,7 +89,12 @@ public class JSHandler {
                 try {
                     encoder.encode(sourceFile, target, attrs);
                 } catch (EncoderException e) {
-                    System.out.println("Could not complete:\n\t" + e);
+                    Bot.log(getLogType(), "Could not complete:\n\t" + e.getMessage());
+                    channel.sendMessageEmbeds(new EmbedBuilder()
+                                .setColor(Color.red)
+                                .addField("Failure", "Could not upload sound. Make sure sound is a stereo track, not a mono track", false)
+                                .build())
+                            .queue();
                     //noinspection ResultOfMethodCallIgnored
                     sourceFile.delete();
                     return false;
