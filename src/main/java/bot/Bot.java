@@ -496,7 +496,9 @@ public class Bot extends ListenerAdapter{
     // Main and stuff.
     public static void main(String[] args) {
 
-        Thread.setDefaultUncaughtExceptionHandler(new UncaughtException());
+        Thread.UncaughtExceptionHandler globalExceptionHandler = new UncaughtException();
+        Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
+        Thread.currentThread().setUncaughtExceptionHandler(globalExceptionHandler);
 
         Bot bot = new Bot();
 

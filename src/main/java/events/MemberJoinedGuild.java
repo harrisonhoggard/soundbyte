@@ -40,7 +40,7 @@ public class MemberJoinedGuild extends EventObject {
                                     ",** \n\nWelcome to " + guild.getName() + "! I am " + Config.get("BOT_NAME") +
                                     ". I play custom sounds whenever someone joins a voice channel (think small ringtones)," +
                                     " which is a great way to determine who joined without needing to look! \n\nIf you want to customize a sound, just type in **\"" +
-                                    Config.get("COMMAND_PREFIX") + " help\"** to get started. \n\nTo invite me to your server, find me on Top.gg")
+                                    Config.get("COMMAND_PREFIX") + " help\"** in your server's text channel to get started. \n\nTo invite me to your server, find me on Top.gg")
                         .build()))
                     .queue();
             details = "welcomed new member";
