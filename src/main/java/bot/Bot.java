@@ -270,8 +270,11 @@ public class Bot extends ListenerAdapter{
             }
         }
 
-        defaultChannels.put(guild, visibleChannel);
-        log(getLogType(), guild.getId() + ": set default channel to " + defaultChannels.get(guild).getId());
+        if (visibleChannel != null)
+        {
+            defaultChannels.put(guild, visibleChannel);
+            log(getLogType(), guild.getId() + ": set default channel to " + defaultChannels.get(guild).getId());
+        }
 
         if (aws.getItem("SoundByteServerList", "ServerID", guild.getId()).isEmpty())
         {
@@ -496,9 +499,9 @@ public class Bot extends ListenerAdapter{
     // Main and stuff.
     public static void main(String[] args) {
 
-        Thread.UncaughtExceptionHandler globalExceptionHandler = new UncaughtException();
-        Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
-        Thread.currentThread().setUncaughtExceptionHandler(globalExceptionHandler);
+        //Thread.UncaughtExceptionHandler globalExceptionHandler = new UncaughtException();
+        //Thread.setDefaultUncaughtExceptionHandler(globalExceptionHandler);
+        //Thread.currentThread().setUncaughtExceptionHandler(globalExceptionHandler);
 
         Bot bot = new Bot();
 
